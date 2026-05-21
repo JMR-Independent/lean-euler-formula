@@ -82,12 +82,18 @@ theorem bipartite_edge_bound {v e f : ℕ} (hv : 3 ≤ v)
     (h : PlanarGraph v e f) (hf : 4 * f ≤ 2 * e) : e ≤ 2 * v - 4 := by
   have := euler_formula h; omega
 
-/-- **K₅ is not planar**: 10 edges > 3·5-6 = 9. -/
-theorem k5_not_planar : ¬ ∃ f, PlanarGraph 5 10 f := by
-  rintro ⟨f, h⟩; have := euler_formula h; omega
+/--
+**K₅ is not planar** (assuming every face has ≥ 3 edges, i.e. no multi-edges or loops).
+If K₅ were embedded planarly: Euler gives f = 7, but then 3·7 = 21 > 2·10 = 20. Contradiction.
+-/
+theorem k5_not_planar : ¬ ∃ f, PlanarGraph 5 10 f ∧ 3 * f ≤ 2 * 10 := by
+  rintro ⟨f, h, hf⟩; have := euler_formula h; omega
 
-/-- **K₃,₃ is not planar**: 9 edges > 2·6-4 = 8 (bipartite bound). -/
-theorem k33_not_planar : ¬ ∃ f, PlanarGraph 6 9 f := by
-  rintro ⟨f, h⟩; have := euler_formula h; omega
+/--
+**K₃,₃ is not planar** (bipartite: every face has ≥ 4 edges).
+If K₃,₃ were embedded planarly: Euler gives f = 5, but then 4·5 = 20 > 2·9 = 18. Contradiction.
+-/
+theorem k33_not_planar : ¬ ∃ f, PlanarGraph 6 9 f ∧ 4 * f ≤ 2 * 9 := by
+  rintro ⟨f, h, hf⟩; have := euler_formula h; omega
 
 end PlanarGraph
