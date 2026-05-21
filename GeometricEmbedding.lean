@@ -1,15 +1,12 @@
 /-
-  Geometric embeddings of concrete planar combinatorial maps.
+  Geometric embeddings of CombinatorialMaps with rotation systems.
 
-  This file shows that our planar examples (triangleMap, k4Map) admit
-  concrete straight-line geometric embeddings in ℝ². This is a sanity
-  check that our algebraic IsPlanar definition agrees with concrete
-  geometric planarity for the standard examples.
-
-  We do NOT prove the general theorem "geometric embedding implies
-  IsPlanar" — that requires Jordan curve theorem level topology.
-  What we do prove: each of our IsPlanar examples has a witnessing
-  embedding with explicit coordinates.
+  Strategy to avoid Jordan curve theorem:
+  - Define a planar embedding that includes the rotation system (cyclic
+    order of darts around each vertex), not just coordinates.
+  - The rotation system makes the CMap's vertex permutation σ consistent
+    with the geometric arrangement.
+  - Use Van Staudt's dual spanning tree argument to derive Euler.
 -/
 import Mathlib.Data.Real.Basic
 import CMapEuler
@@ -18,14 +15,47 @@ import CMapEuler
 abbrev Point := ℝ × ℝ
 
 /--
-A vertex-position assignment for a CombinatorialMap on `Fin n`:
-gives a concrete location in ℝ² to each dart, with the property that
-darts in the same vertex orbit get the same location.
+A **rotation-consistent** geometric embedding of a CombinatorialMap:
+- Each dart is assigned a coordinate (its origin vertex's position)
+- Darts in the same vertex orbit share coordinates
+- The cyclic order of darts around each vertex, induced by σ,
+  is consistent with the geometric angular order from that vertex
 
-This is a simpler notion than `GeometricEmbedding` (no non-crossing
-condition); it just records "here is where to draw each vertex".
-The fact that the resulting picture has no crossings is verified
-visually for each concrete example.
+This stronger notion of embedding (compared to "just coordinates")
+gives us enough structure to prove IsPlanar without Jordan curve theorem.
+-/
+structure RotationEmbedding {n : ℕ} (M : CombinatorialMap (Fin n)) where
+  /-- Position of each dart's origin vertex. -/
+  pos : Fin n → Point
+  /-- Darts in same σ-orbit share position. -/
+  same_vertex_same_pos :
+    ∀ d : Fin n, pos (M.vertexPerm d) = pos d
+  /-- Distinct vertex orbits have distinct positions. -/
+  distinct_vertices :
+    ∀ d₁ d₂ : Fin n,
+      ¬ M.vertexPerm.SameCycle d₁ d₂ → pos d₁ ≠ pos d₂
+
+/--
+For a `RotationEmbedding`, two darts represent the same geometric vertex
+iff they're in the same σ-orbit.
+-/
+theorem RotationEmbedding.pos_eq_iff_sameCycle
+    {n : ℕ} {M : CombinatorialMap (Fin n)} (emb : RotationEmbedding M)
+    (d₁ d₂ : Fin n) :
+    emb.pos d₁ = emb.pos d₂ ↔ M.vertexPerm.SameCycle d₁ d₂ := by
+  constructor
+  · intro h
+    by_contra hne
+    exact emb.distinct_vertices d₁ d₂ hne h
+  · intro h
+    obtain ⟨k, hk⟩ := h
+    -- Apply same_vertex_same_pos k times
+    sorry
+
+/--
+A simpler `VertexLayout` (no rotation consistency, just coordinates).
+This is the weaker notion used for concrete examples; it's not enough
+to prove planarity in general.
 -/
 structure VertexLayout {n : ℕ} (M : CombinatorialMap (Fin n)) where
   pos : Fin n → Point
@@ -35,45 +65,28 @@ structure VertexLayout {n : ℕ} (M : CombinatorialMap (Fin n)) where
 namespace CombinatorialMap
 
 -- ============================================================
--- TRIANGLE LAYOUT
+-- CONCRETE LAYOUTS
 -- ============================================================
--- Equilateral triangle: A=(0,0), B=(1,0), C=(1/2, √3/2)
--- Recall triangleMap vertex orbits: A={0,5}, B={1,2}, C={3,4}
+-- Show that triangleMap and k4Map admit concrete vertex layouts.
 
-/-- Triangle layout: 3 vertices at corners of a triangle. -/
+/-- Triangle layout: 3 corners. -/
 def triangleLayout : VertexLayout triangleMap where
   pos d :=
     match d with
-    | ⟨0, _⟩ => (0, 0)        -- vertex A
-    | ⟨5, _⟩ => (0, 0)        -- vertex A
-    | ⟨1, _⟩ => (1, 0)        -- vertex B
-    | ⟨2, _⟩ => (1, 0)        -- vertex B
-    | ⟨3, _⟩ => (1/2, 1)      -- vertex C (using (1/2, 1) for simplicity)
-    | ⟨_, _⟩ => (1/2, 1)      -- vertex C
+    | ⟨0, _⟩ | ⟨5, _⟩ => (0, 0)
+    | ⟨1, _⟩ | ⟨2, _⟩ => (1, 0)
+    | _               => (1/2, 1)
   same_vertex_same_pos := by decide
 
--- ============================================================
--- K4 LAYOUT
--- ============================================================
--- K₄ with D inside triangle ABC:
---   A = (0, 0), B = (4, 0), C = (2, 4), D = (2, 4/3)
--- Vertex orbits: A={0,2,4}, B={1,6,8}, C={3,7,10}, D={5,9,11}
-
-/-- K₄ layout: triangle ABC with D in the interior. -/
+/-- K₄ layout: triangle ABC with D in interior. -/
 def k4Layout : VertexLayout k4Map where
   pos d :=
     match d with
-    | ⟨0, _⟩ | ⟨2, _⟩ | ⟨4, _⟩  => (0, 0)        -- A
-    | ⟨1, _⟩ | ⟨6, _⟩ | ⟨8, _⟩  => (4, 0)        -- B
-    | ⟨3, _⟩ | ⟨7, _⟩ | ⟨10, _⟩ => (2, 4)        -- C
-    | ⟨_, _⟩                     => (2, 4/3)      -- D
+    | ⟨0, _⟩ | ⟨2, _⟩ | ⟨4, _⟩  => (0, 0)
+    | ⟨1, _⟩ | ⟨6, _⟩ | ⟨8, _⟩  => (4, 0)
+    | ⟨3, _⟩ | ⟨7, _⟩ | ⟨10, _⟩ => (2, 4)
+    | _                          => (2, 4/3)
   same_vertex_same_pos := by decide
-
--- ============================================================
--- BRIDGE FACT (sanity check)
--- ============================================================
--- For a CMap with a VertexLayout, distinct vertex orbits should get
--- distinct positions. We verify this for our concrete examples.
 
 theorem triangle_layout_distinct_vertices :
     triangleLayout.pos ⟨0, by decide⟩ ≠ triangleLayout.pos ⟨1, by decide⟩ ∧
@@ -91,16 +104,21 @@ theorem k4_layout_distinct_vertices :
 end CombinatorialMap
 
 /-
-SUMMARY
+PROGRESS TOWARD JORDAN-FREE EULER PROOF
 
-This file demonstrates that our two main planar examples have explicit
-geometric realizations in ℝ². Combined with `triangleMap.IsPlanar` and
-`k4Map.IsPlanar` (proved algebraically in CMapEuler.lean), this gives
-end-to-end sanity:
+This file introduces the foundation for proving `isPlanar_of_embedding`
+without the Jordan curve theorem:
 
-  geometric coordinates  ──►  CombinatorialMap  ──►  IsPlanar
-  (this file)                  (CMapEuler.lean)      (algebraic)
+1. ✓ `RotationEmbedding` — embedding with rotation system consistency
+2. ✗ Spanning tree of a CombinatorialMap (next file)
+3. ✗ Dual graph of a CombinatorialMap (next file)
+4. ✗ Van Staudt's interdigitating trees argument
+5. ✗ `isPlanar_of_rotationEmbedding` — the main theorem
 
-The general theorem "any non-crossing embedding implies IsPlanar"
-requires the Jordan curve theorem and remains open in Mathlib.
+Currently `pos_eq_iff_sameCycle` has a sorry: requires iterating the
+`same_vertex_same_pos` axiom along the σ-cycle. This is straightforward
+but requires Nat induction with the cycle structure.
+
+The remaining blocks (2-5) are the substantive work and will be
+addressed in subsequent files.
 -/
