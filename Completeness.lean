@@ -135,12 +135,32 @@ def IsConnected : Prop :=
   ∀ d₁ d₂ : D, ∃ (moves : List Bool),
     moves.foldl (fun d b => if b then M.edgePerm d else M.vertexPerm d) d₁ = d₂
 
-/-- For a connected CMap, V + F = |D|/2 + 2. -/
+/--
+**For a connected CMap, V + F = |D|/2 + 2.**
+
+Proof sketch (induction on |D|):
+
+Base (|D| = 2): One edge {d₀, d₁}. Two sub-cases:
+  - vertexPerm = id: V=2, F=1, 2+1 = 1+2 ✓
+  - vertexPerm = swap: V=1, F=2, 1+2 = 1+2 ✓
+
+Inductive step (|D| ≥ 4): pick dart d, let d' = edgePerm d.
+  Case A: d and d' in different σ-orbits (edge between distinct vertices).
+    Contract {d, d'}: V→V-1, E→E-1, F unchanged.
+    IH on |D|-2 darts gives (V-1)+F = (|D|-2)/2 + 2.
+    So V+F = |D|/2 + 2 ✓
+
+  Case B: d and d' in same σ-orbit (loop at one vertex).
+    Delete {d, d'}: V unchanged, E→E-1, F→F-1.
+    IH on |D|-2 darts gives V+(F-1) = (|D|-2)/2 + 2.
+    So V+F = |D|/2 + 2 ✓
+
+The remaining implementation challenge: formally defining the
+contracted/deleted CMap on D \ {d, d'} ≃ Fin (|D|-2) and showing
+its orbit counts change as stated. This is the only remaining sorry.
+-/
 theorem vertex_face_eq_of_connected (hconn : M.IsConnected) :
     Fintype.card M.Vertex + Fintype.card M.Face = Fintype.card D / 2 + 2 := by
-  -- Induction on Fintype.card D
-  -- Base: |D| = 2, one edge, two possible vertex configs, both give V+F = 3 = 1+2
-  -- Step: pick dart d, contract or delete edge {d, edgePerm d}
   sorry
 
 -- ============================================================
