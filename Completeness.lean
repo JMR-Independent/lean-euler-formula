@@ -68,31 +68,48 @@ lemma dart_count_eq_twice_edges :
     exact ⟨rfl, hall⟩]
   simp [Multiset.sum_replicate]
 
+/-- For a fixed-point-free involution, SameCycle d₀ d ↔ d = d₀ ∨ d = edgePerm d₀. -/
+lemma edgePerm_sameCycle_iff (d₀ d : D) :
+    M.edgePerm.SameCycle d₀ d ↔ d = d₀ ∨ d = M.edgePerm d₀ := by
+  constructor
+  · intro ⟨n, hn⟩
+    -- edgePerm^2 = 1, so edgePerm^n = id (n even) or edgePerm (n odd)
+    have h2 : M.edgePerm ^ (2 : ℤ) = 1 := by
+      ext x; simp [zpow_succ, zpow_zero, Equiv.Perm.mul_apply, M.edgePerm_involutive x]
+    rcases Int.even_or_odd n with ⟨k, rfl⟩ | ⟨k, rfl⟩
+    · left
+      have : (M.edgePerm ^ (2 * k)) d₀ = d₀ := by
+        rw [zpow_mul]; simp [h2]
+      rw [this] at hn; exact hn.symm
+    · right
+      have : (M.edgePerm ^ (2 * k + 1)) d₀ = M.edgePerm d₀ := by
+        rw [zpow_add, zpow_mul, zpow_one]; simp [h2]
+      rw [this] at hn; exact hn.symm
+  · rintro (rfl | rfl)
+    · exact ⟨0, by simp⟩
+    · exact ⟨1, by simp⟩
+
 /-- Each edge-orbit (fiber) contains exactly 2 darts. -/
 lemma edgePerm_fiber_card (e : M.Edge) :
     Fintype.card {d : D // (⟦d⟧ : M.Edge) = e} = 2 := by
   obtain ⟨d₀, rfl⟩ := Quotient.exists_rep e
-  -- fiber = {d | SameCycle edgePerm d₀ d} = {d₀, edgePerm d₀}
   have hne : d₀ ≠ M.edgePerm d₀ := (M.edgePerm_no_fixedPoint d₀).symm
-  apply Fintype.card_eq_of_equiv
-  -- Bijection: Fin 2 ≃ {d | SameCycle edgePerm d₀ d}
-  exact {
-    toFun := fun i => ⟨if i = 0 then d₀ else M.edgePerm d₀, by
-      fin_cases i <;> simp [Quotient.eq']
-      · rfl
-      · exact Quotient.sound (Equiv.Perm.SameCycle.symm ⟨1, by simp [M.edgePerm_involutive]⟩)⟩
-    invFun := fun ⟨d, hd⟩ =>
-      if d = d₀ then 0
-      else if d = M.edgePerm d₀ then 1
-      else (absurd rfl (by
-        -- d must be d₀ or edgePerm d₀ (orbit has size 2)
-        sorry))
-    left_inv := fun i => by fin_cases i <;> simp [hne]
-    right_inv := fun ⟨d, hd⟩ => by
-      simp only [Quotient.eq'] at hd
-      -- d and d₀ are in the same orbit of edgePerm (involutive, order 2)
-      -- Therefore d = d₀ or d = edgePerm d₀
-      sorry }
+  -- Fiber = {d₀, edgePerm d₀} exactly
+  have hfiber : ∀ d : D, (⟦d⟧ : M.Edge) = ⟦d₀⟧ ↔ d = d₀ ∨ d = M.edgePerm d₀ := by
+    intro d; rw [Quotient.eq']; exact M.edgePerm_sameCycle_iff d₀ d
+  -- Count the elements
+  have : Fintype.card {d : D // (⟦d⟧ : M.Edge) = ⟦d₀⟧} =
+         ({d₀, M.edgePerm d₀} : Finset D).card := by
+    apply Fintype.card_congr
+    exact {
+      toFun  := fun ⟨d, hd⟩ => ⟨d, by
+        simp [Finset.mem_insert, Finset.mem_singleton]; exact (hfiber d).mp hd⟩
+      invFun := fun ⟨d, hd⟩ => ⟨d, by
+        simp [Finset.mem_insert, Finset.mem_singleton] at hd
+        exact (hfiber d).mpr hd⟩
+      left_inv  := fun _ => rfl
+      right_inv := fun _ => rfl }
+  rw [this, Finset.card_pair hne]
 
 /-- For a fixed-point-free involution: |D| = 2 * |Edge|, so |Edge| = |D|/2. -/
 theorem edge_count_eq :
