@@ -19,3 +19,6 @@ name = "EulerMathlib"
 
 [[lean_lib]]
 name = "CMapEuler"
+
+[[lean_lib]]
+name = "Completeness"
