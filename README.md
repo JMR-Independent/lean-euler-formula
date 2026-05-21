@@ -21,7 +21,7 @@ the `CombinatorialMap` structure from mathlib4 PR #16074.
 
 ## What's not here
 
-The topological direction — connecting `IsPlanar` to planar
+The topological direction connecting `IsPlanar` to planar
 embeddability in ℝ² via the Jordan curve theorem — is not closed.
 This is an open problem across all proof assistants and would
 require substantial topological infrastructure.
