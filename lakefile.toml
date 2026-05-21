@@ -25,3 +25,6 @@ name = "Completeness"
 
 [[lean_lib]]
 name = "IsPlanarIffIsSpherical"
+
+[[lean_lib]]
+name = "GeometricEmbedding"
