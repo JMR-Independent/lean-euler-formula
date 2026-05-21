@@ -22,3 +22,6 @@ name = "CMapEuler"
 
 [[lean_lib]]
 name = "Completeness"
+
+[[lean_lib]]
+name = "IsPlanarIffIsSpherical"
