@@ -1,33 +1,33 @@
-# Euler's Polyhedron Formula — Lean 4 + Mathlib
+# Euler's polyhedron formula in Lean 4
 
-Formalization of **V - E + F = 2** for connected planar graphs.
+Formalization of V - E + F = 2 for planar graphs, built using
+Mathlib. Started as an attempt to provide concrete examples for
+the `CombinatorialMap` structure from mathlib4 PR #16074.
 
-## Main Results
+## What's here
 
-| Theorem | Statement |
-|---------|-----------|
-| `PlanarGraph.euler_formula` | `V + F = E + 2` |
-| `PlanarGraph.euler_int` | `(V : ℤ) - E + F = 2` |
-| `PlanarGraph.k5_not_planar` | K₅ is not planar |
-| `PlanarGraph.k33_not_planar` | K₃,₃ is not planar |
+- `EulerMathlib.lean` — inductive `PlanarGraph V E F` type with three
+  constructors (`point`, `addLeaf`, `addEdge`); `euler_formula` follows
+  by structural induction.
+- `CMapEuler.lean` — replicates the `CombinatorialMap` structure from
+  PR #16074; defines `IsSpherical` as the bridge to `PlanarGraph`;
+  proves `triangleMap.IsPlanar` and `k4Map.IsPlanar` via `native_decide`.
+- `Completeness.lean` — proves `edge_count_eq`
+  (`Fintype.card M.Edge = Fintype.card D / 2` for any CMap with a
+  fixed-point-free involution); includes `torusCMap` as a counterexample
+  showing that connected CMaps need not be planar.
+- `IsPlanarIffIsSpherical.lean` — the algebraic equivalence
+  `IsPlanar ↔ IsSpherical` for connected CMaps.
 
-## Approach
+## What's not here
 
-`PlanarGraph V E F` is an inductive type with three constructors:
-- `point` — single vertex (1, 0, 1)
-- `addLeaf` — attach pendant vertex+edge (V+1, E+1, F)
-- `addEdge` — split a face (V, E+1, F+1)
-
-Euler's formula follows by structural induction; `omega` closes all cases.
+The topological direction — connecting `IsPlanar` to planar
+embeddability in ℝ² via the Jordan curve theorem — is not closed.
+This is an open problem across all proof assistants and would
+require substantial topological infrastructure.
 
 ## Build
 
-```bash
-lake build
-```
+    lake build
 
-## Background
-
-This formalization accompanies a standalone (no-Mathlib) version:
-- Pick's theorem: complete, 0 sorry
-- Euler's formula (core Lean 4): complete, 0 sorry
+CI runs on Lean 4.29.1 with Mathlib.
