@@ -68,23 +68,43 @@ lemma dart_count_eq_twice_edges :
     exact ⟨rfl, hall⟩]
   simp [Multiset.sum_replicate]
 
-/-- The number of edge-orbits equals cycleType.card (no fixed points). -/
-lemma edgePerm_card_orbits_eq :
-    Fintype.card M.Edge = M.edgePerm.cycleType.card := by
-  -- For a fixed-point-free permutation, orbit count = cycleType.card
-  -- (no fixed-point orbits to add)
-  have hsupp : M.edgePerm.support = Finset.univ := M.edgePerm_support_eq_univ
-  rw [show Fintype.card M.Edge =
-    Fintype.card (Quotient (Equiv.Perm.SameCycle.setoid M.edgePerm)) from rfl]
-  rw [← Equiv.Perm.card_orbits_eq]
-  simp [Equiv.Perm.card_orbits, hsupp, Finset.card_univ]
-  sorry -- connecting Fintype.card quotient to orbit count
+/-- Each edge-orbit (fiber) contains exactly 2 darts. -/
+lemma edgePerm_fiber_card (e : M.Edge) :
+    Fintype.card {d : D // (⟦d⟧ : M.Edge) = e} = 2 := by
+  obtain ⟨d₀, rfl⟩ := Quotient.exists_rep e
+  -- fiber = {d | SameCycle edgePerm d₀ d} = {d₀, edgePerm d₀}
+  have hne : d₀ ≠ M.edgePerm d₀ := (M.edgePerm_no_fixedPoint d₀).symm
+  apply Fintype.card_eq_of_equiv
+  -- Bijection: Fin 2 ≃ {d | SameCycle edgePerm d₀ d}
+  exact {
+    toFun := fun i => ⟨if i = 0 then d₀ else M.edgePerm d₀, by
+      fin_cases i <;> simp [Quotient.eq']
+      · rfl
+      · exact Quotient.sound (Equiv.Perm.SameCycle.symm ⟨1, by simp [M.edgePerm_involutive]⟩)⟩
+    invFun := fun ⟨d, hd⟩ =>
+      if d = d₀ then 0
+      else if d = M.edgePerm d₀ then 1
+      else (absurd rfl (by
+        -- d must be d₀ or edgePerm d₀ (orbit has size 2)
+        sorry))
+    left_inv := fun i => by fin_cases i <;> simp [hne]
+    right_inv := fun ⟨d, hd⟩ => by
+      simp only [Quotient.eq'] at hd
+      -- d and d₀ are in the same orbit of edgePerm (involutive, order 2)
+      -- Therefore d = d₀ or d = edgePerm d₀
+      sorry }
 
-/-- For a fixed-point-free involution, the number of edges is |D| / 2. -/
+/-- For a fixed-point-free involution: |D| = 2 * |Edge|, so |Edge| = |D|/2. -/
 theorem edge_count_eq :
     Fintype.card M.Edge = Fintype.card D / 2 := by
-  have h := M.dart_count_eq_twice_edges
-  rw [M.edgePerm_card_orbits_eq]
+  -- Use the fiber decomposition: D = Σ e : M.Edge, fiber(e)
+  -- Each fiber has size 2 → |D| = 2 * |M.Edge| → |M.Edge| = |D|/2
+  have hfib := M.edgePerm_fiber_card
+  have hbij : (Σ e : M.Edge, {d : D // (⟦d⟧ : M.Edge) = e}) ≃ D :=
+    Equiv.sigmaFibEquiv (Quotient.mk _)
+  have hcard : Fintype.card D = 2 * Fintype.card M.Edge := by
+    rw [← Fintype.card_congr hbij, Fintype.card_sigma]
+    simp [hfib, Finset.sum_const, Finset.card_univ]
   omega
 
 -- ============================================================
