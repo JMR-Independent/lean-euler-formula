@@ -129,3 +129,64 @@ theorem triangleMap_isSpherical : triangleMap.IsSpherical :=
 /-- The triangle map is planar (eulerCharacteristic = 2) -/
 theorem triangleMap_isPlanar : triangleMap.IsPlanar :=
   triangleMap.eulerChar_of_spherical triangleMap_isSpherical
+
+-- ============================================================
+-- CONCRETE EXAMPLE: K₄ MAP
+-- ============================================================
+-- 12 darts: 2 per edge × 6 edges
+-- Dart labeling: edge AB={0,1}, AC={2,3}, AD={4,5},
+--               BC={6,7}, BD={8,9}, CD={10,11}
+-- (dart 0 from A→B, dart 1 from B→A, etc.)
+--
+-- Planar embedding: D inside triangle ABC
+-- Rotation at each vertex (CCW order of leaving darts):
+--   A: 0→4→2→0  (toward B, D, C)  → 3-cycle (0 4 2)
+--   B: 1→6→8→1  (toward A, C, D)  → 3-cycle (1 6 8)
+--   C: 3→10→7→3 (toward A, D, B)  → 3-cycle (3 10 7)
+--   D: 5→9→11→5 (toward A, B, C)  → 3-cycle (5 9 11)
+--
+-- Face orbits of φ = σ⁻¹ ∘ α:
+--   {0,8,5}  = triangle ABD  ✓
+--   {2,7,1}  = triangle ACB (outer) ✓
+--   {4,11,3} = triangle ACD ✓
+--   {6,10,9} = triangle BCD ✓  →  F=4
+
+/-- K₄ combinatorial map: V=4, E=6, F=4 on 12 darts -/
+def k4Map : CombinatorialMap (Fin 12) where
+  -- edgePerm: (0↔1)(2↔3)(4↔5)(6↔7)(8↔9)(10↔11)
+  edgePerm :=
+    Equiv.swap 0 1 * Equiv.swap 2 3 * Equiv.swap 4 5 *
+    Equiv.swap 6 7 * Equiv.swap 8 9 * Equiv.swap 10 11
+  -- vertexPerm: 3-cycles (0 4 2)(1 6 8)(3 10 7)(5 9 11)
+  -- 3-cycle (a b c) = Equiv.swap a b * Equiv.swap b c
+  vertexPerm :=
+    Equiv.swap 0 4 * Equiv.swap 4 2 *
+    Equiv.swap 1 6 * Equiv.swap 6 8 *
+    Equiv.swap 3 10 * Equiv.swap 10 7 *
+    Equiv.swap 5 9 * Equiv.swap 9 11
+  -- facePerm: 3-cycles (0 8 5)(2 7 1)(4 11 3)(6 10 9)
+  -- Derived from φ = σ⁻¹ ∘ α, verified by the table above
+  facePerm :=
+    Equiv.swap 0 8 * Equiv.swap 8 5 *
+    Equiv.swap 2 7 * Equiv.swap 7 1 *
+    Equiv.swap 4 11 * Equiv.swap 11 3 *
+    Equiv.swap 6 10 * Equiv.swap 10 9
+  face_mul_edge_mul_vertex_eq_one := by native_decide
+  edgePerm_involutive              := by native_decide
+  isEmpty_fixedPoints_edgePerm     := by
+    refine ⟨fun ⟨d, hd⟩ => ?_⟩
+    fin_cases d <;> simp [Function.fixedPoints] at hd
+
+-- Verify orbit counts
+example : Fintype.card (k4Map.Vertex) = 4 := by native_decide
+example : Fintype.card (k4Map.Edge)   = 6 := by native_decide
+example : Fintype.card (k4Map.Face)   = 4 := by native_decide
+
+/-- The K₄ map is spherical: orbit counts match PlanarGraph 4 6 4 -/
+theorem k4Map_isSpherical : k4Map.IsSpherical :=
+  ⟨4, 6, 4, PlanarGraph.k4,
+    by native_decide, by native_decide, by native_decide⟩
+
+/-- K₄ is planar: eulerCharacteristic = 4 - 6 + 4 = 2 ✓ -/
+theorem k4Map_isPlanar : k4Map.IsPlanar :=
+  k4Map.eulerChar_of_spherical k4Map_isSpherical
