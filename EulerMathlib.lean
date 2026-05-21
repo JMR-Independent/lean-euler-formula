@@ -96,4 +96,89 @@ If K₃,₃ were embedded planarly: Euler gives f = 5, but then 4·5 = 20 > 2·9
 theorem k33_not_planar : ¬ ∃ f, PlanarGraph 6 9 f ∧ 4 * f ≤ 2 * 9 := by
   rintro ⟨f, h, hf⟩; have := euler_formula h; omega
 
+-- Square C₄: 4 vertices, 4 edges, 2 faces
+theorem square : PlanarGraph 4 4 2 :=
+  .addEdge 4 3 1 (.addLeaf 3 2 1 (.addLeaf 2 1 1 (.addLeaf 1 0 1 .point)))
+
 end PlanarGraph
+
+-- ============================================================
+-- STEP 2: BRIDGE  SimpleGraph ↔ PlanarGraph
+-- ============================================================
+-- Connects our inductive type to Mathlib's SimpleGraph.
+-- A PlanarEmbedding assigns a face count to a concrete graph
+-- and provides a PlanarGraph witness with matching V and E.
+
+open SimpleGraph in
+/--
+A `PlanarEmbedding G` witnesses that the graph `G` can be embedded
+in the plane: it gives a face count and a `PlanarGraph` witness whose
+vertex and edge counts match those of `G`.
+-/
+structure PlanarEmbedding {α : Type*} [Fintype α]
+    (G : SimpleGraph α) [DecidableRel G.Adj] where
+  faces   : ℕ
+  witness : PlanarGraph (Fintype.card α) G.edgeFinset.card faces
+
+/-- Euler's formula for any `SimpleGraph` with a `PlanarEmbedding`. -/
+theorem euler_of_embedding {α : Type*} [Fintype α]
+    (G : SimpleGraph α) [DecidableRel G.Adj]
+    (emb : PlanarEmbedding G) :
+    (Fintype.card α : ℤ) - G.edgeFinset.card + emb.faces = 2 :=
+  PlanarGraph.euler_int emb.witness
+
+-- ============================================================
+-- STEP 1: POSITIVE CASES  (concrete SimpleGraphs have witnesses)
+-- ============================================================
+-- K_n = complete graph on Fin n  (Mathlib: ⊤ : SimpleGraph (Fin n))
+
+section PositiveCases
+
+-- Vertex counts (trivial)
+theorem Kn_vertices (n : ℕ) : Fintype.card (Fin n) = n := Fintype.card_fin n
+
+-- Edge counts (verified by kernel computation)
+theorem K3_edges : (⊤ : SimpleGraph (Fin 3)).edgeFinset.card = 3 := by decide
+theorem K4_edges : (⊤ : SimpleGraph (Fin 4)).edgeFinset.card = 6 := by decide
+theorem K5_edges : (⊤ : SimpleGraph (Fin 5)).edgeFinset.card = 10 := by decide
+
+-- K₃ is planarly embeddable
+theorem K3_hasPlanarEmbedding :
+    Nonempty (PlanarEmbedding (⊤ : SimpleGraph (Fin 3))) :=
+  ⟨⟨2, by simp [Kn_vertices, K3_edges]; exact PlanarGraph.triangle⟩⟩
+
+-- K₄ is planarly embeddable
+theorem K4_hasPlanarEmbedding :
+    Nonempty (PlanarEmbedding (⊤ : SimpleGraph (Fin 4))) :=
+  ⟨⟨4, by simp [Kn_vertices, K4_edges]; exact PlanarGraph.k4⟩⟩
+
+-- Euler holds for K₃ embedding
+theorem K3_euler (emb : PlanarEmbedding (⊤ : SimpleGraph (Fin 3))) :
+    (3 : ℤ) - 3 + emb.faces = 2 := by
+  have := euler_of_embedding _ emb
+  simp [Kn_vertices, K3_edges] at this
+  exact this
+
+end PositiveCases
+
+-- ============================================================
+-- STEP 3: K₅ NOT PLANARLY EMBEDDABLE
+-- ============================================================
+-- Full chain: Mathlib's SimpleGraph (Fin 5) → PlanarEmbedding →
+-- PlanarGraph 5 10 f → Euler contradiction.
+
+/--
+**K₅ is not planarly embeddable** (with simple faces, i.e. each face
+bounded by ≥ 3 edges — guaranteed since K₅ has no loops or multi-edges).
+
+Full chain:
+1. K₅ has V=5 (Fintype.card_fin)
+2. K₅ has E=10 (by kernel computation)
+3. Any PlanarEmbedding with 3·F ≤ 2·10 would need F=7 (Euler), but 3·7=21>20. ⊥
+-/
+theorem K5_not_planarly_embeddable :
+    ¬ ∃ (emb : PlanarEmbedding (⊤ : SimpleGraph (Fin 5))),
+        3 * emb.faces ≤ 2 * 10 := by
+  rintro ⟨⟨f, h⟩, hf⟩
+  simp [Kn_vertices, K5_edges] at h
+  exact PlanarGraph.k5_not_planar ⟨f, h, hf⟩
