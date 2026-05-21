@@ -167,39 +167,74 @@ lemma facePerm_eq_inv_mul :
   simp [mul_assoc, mul_inv_cancel, inv_mul_cancel] at this
   exact this
 
--- Key lemma for base case: CMaps on 2-element set always have V+F = 3
-lemma vertex_face_fin2 (M : CombinatorialMap (Fin 2)) (hconn : M.IsConnected) :
-    Fintype.card M.Vertex + Fintype.card M.Face = 3 := by
-  -- On Fin 2: edgePerm must swap 0 and 1 (only fixed-point-free involution)
-  -- distinct_neighbors: σ(d) ≠ edgePerm(d) for all d → vertexPerm ≠ edgePerm
-  -- Only fixed-point-free perm on Fin 2 is the swap, so vertexPerm ≠ swap → vertexPerm = id
-  -- V = 2 (id has 2 orbits), facePerm = id⁻¹ * swap = swap, F = 1
-  -- V + F = 2 + 1 = 3 ✓
-  native_decide
+-- ============================================================
+-- COUNTEREXAMPLE: THE TORUS MAP
+-- ============================================================
+-- The theorem "every connected CMap has V + F = |D|/2 + 2" is FALSE.
+-- Connectivity alone does not imply Euler characteristic = 2.
+-- A torus map is connected but has V - E + F = 0 (genus 1), not 2.
+--
+-- Torus CMap on Fin 4:
+--   edgePerm:   (0 1)(2 3)  — two edges, E = 2
+--   vertexPerm: (0 2 1 3)   — one vertex containing all 4 darts, V = 1
+--   facePerm:   (0 2 1 3)⁻¹ * (0 1)(2 3) = 0→2→1→3→0 — one face, F = 1
+--
+-- V + F = 1 + 1 = 2  ≠  |D|/2 + 2 = 4/2 + 2 = 4
+-- This is a torus: V - E + F = 1 - 2 + 1 = 0 = 2 - 2·genus where genus = 1.
+--
+-- The CMap is valid: all axioms satisfied (distinct_neighbors, involutive, etc.)
+-- The CMap is connected: ⟨edgePerm, vertexPerm⟩ acts transitively on Fin 4.
 
-theorem vertex_face_eq_of_connected (hconn : M.IsConnected) :
-    Fintype.card M.Vertex + Fintype.card M.Face = Fintype.card D / 2 + 2 := by
-  -- Strategy: induction on Fintype.card D via Fintype.equivFin
-  -- Each step contracts or deletes an edge {d₀, edgePerm d₀}:
-  --   Contract (different vertex orbits): V-1, E-1, F → (V-1)+F = (|D|-2)/2 + 2
-  --   Delete   (same vertex orbit, loop): V, E-1, F-1 → V+(F-1) = (|D|-2)/2 + 2
-  -- distinct_neighbors guarantees the skip is clean (σ(d₀) ≠ d₁, σ(d₁) ≠ d₀)
-  -- The explicit CMap on D\{d₀,d₁} ≃ Fin(|D|-2) requires:
-  --   - An order embedding Fin(|D|-2) ↪ Fin|D| avoiding d₀ and d₁
-  --   - New vertexPerm: σ'(prev(d₀)) = σ(d₀) or σ(d₁) depending on case
-  -- This construction is the implementation gap.
-  sorry
+/-- A valid connected CMap on the torus satisfying all CombinatorialMap axioms. -/
+def torusCMap : CombinatorialMap (Fin 4) where
+  -- edgePerm: (0 1)(2 3)
+  edgePerm | ⟨0,_⟩ => ⟨1,by decide⟩ | ⟨1,_⟩ => ⟨0,by decide⟩
+            | ⟨2,_⟩ => ⟨3,by decide⟩ | ⟨_,_⟩ => ⟨2,by decide⟩
+  -- vertexPerm: (0 2 1 3) — one vertex, degree 4
+  vertexPerm | ⟨0,_⟩ => ⟨2,by decide⟩ | ⟨1,_⟩ => ⟨3,by decide⟩
+              | ⟨2,_⟩ => ⟨1,by decide⟩ | ⟨_,_⟩ => ⟨0,by decide⟩
+  -- facePerm: σ⁻¹ ∘ α = (0 3 1 2) ∘ (0 1)(2 3) = 0→2→1→3→0, one face
+  facePerm | ⟨0,_⟩ => ⟨2,by decide⟩ | ⟨1,_⟩ => ⟨3,by decide⟩
+            | ⟨2,_⟩ => ⟨1,by decide⟩ | ⟨_,_⟩ => ⟨0,by decide⟩
+  face_mul_edge_mul_vertex_eq_one    := by decide
+  edgePerm_involutive                := by decide
+  isEmpty_fixedPoints_edgePerm       := by
+    refine ⟨fun ⟨d, hd⟩ => ?_⟩
+    fin_cases d <;> simp [Function.fixedPoints] at hd
+
+-- V = 1, E = 2, F = 1: verified by the kernel
+example : Fintype.card (torusCMap.Vertex) = 1 := by native_decide
+example : Fintype.card (torusCMap.Edge)   = 2 := by native_decide
+example : Fintype.card (torusCMap.Face)   = 1 := by native_decide
+
+-- The torus CMap is connected
+theorem torusCMap_connected : torusCMap.IsConnected := by native_decide
+
+-- Its Euler characteristic is 0, not 2 — it is NOT planar
+-- V - E + F = 1 - 2 + 1 = 0  (genus 1 torus)
+-- V + F = 2  ≠  |D|/2 + 2 = 4
+example : torusCMap.eulerCharacteristic = 0 := by native_decide
+example : ¬ torusCMap.IsPlanar          := by native_decide
 
 -- ============================================================
--- STEP 3: EULER FORMULA FOR CONNECTED CMaps
+-- CONCLUSION: THE CORRECT COMPLETENESS THEOREM
 -- ============================================================
-
-/-- **Main completeness theorem**: every connected CMap satisfies Euler. -/
-theorem euler_of_connected (hconn : M.IsConnected) : M.IsPlanar := by
-  simp only [IsPlanar, eulerCharacteristic]
-  -- V - E + F = (V + F) - E = (|D|/2 + 2) - |D|/2 = 2
-  have hE := M.edge_count_eq
-  have hVF := M.vertex_face_eq_of_connected hconn
-  omega
+-- The theorem "every connected CMap has V + F = |D|/2 + 2" requires
+-- a planarity / genus-0 hypothesis. Connectivity alone is insufficient.
+--
+-- The CORRECT completeness theorem is:
+--   IsSpherical M → M.IsPlanar   (= eulerChar_of_spherical, already proved)
+--
+-- The remaining open question: which connected CMaps are IsSpherical?
+-- This is equivalent to: which CMaps have genus 0?
+-- The answer requires planarity theory (Jordan curve theorem or equivalent).
+--
+-- What we have proved:
+-- ✓ euler_formula: PlanarGraph → V + F = E + 2  (complete)
+-- ✓ edge_count_eq: |Edge| = |D|/2 for any CMap  (complete)
+-- ✓ eulerChar_of_spherical: IsSpherical → IsPlanar  (complete)
+-- ✓ Concrete examples: triangle, K₄ are IsPlanar  (complete)
+-- ✓ Torus CMap: connected but NOT IsPlanar  (counterexample, complete)
+-- ✗ "All sphere-embedded CMaps are IsSpherical" — requires planarity theory
 
 end CombinatorialMap
