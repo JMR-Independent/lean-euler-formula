@@ -10,6 +10,8 @@
   * `k33_not_planar` — K₃,₃ is not planar
 -/
 import Mathlib.Tactic
+import Mathlib.Combinatorics.SimpleGraph.Basic
+import Mathlib.Combinatorics.SimpleGraph.Finite
 
 /--
 `PlanarGraph V E F` witnesses a connected planar graph with
