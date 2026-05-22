@@ -321,3 +321,84 @@ theorem cubeMap_isSpherical : cubeMap.IsSpherical :=
 /-- The cube is planar: V - E + F = 8 - 12 + 6 = 2 ✓ -/
 theorem cubeMap_isPlanar : cubeMap.IsPlanar :=
   cubeMap.eulerChar_of_spherical cubeMap_isSpherical
+
+-- ============================================================
+-- OCTAHEDRON CMAP  (V=6, E=12, F=8, 24 darts)
+-- ============================================================
+-- Vertices 0..5: 0=top, 5=bottom, 1,2,3,4=equator (in cyclic order).
+-- Each vertex has degree 4 (4 outgoing darts).
+-- Total darts: 6 × 4 = 24.
+--
+-- Vertex neighbors:
+--   0 (top):     1, 2, 3, 4
+--   1 (eq):      0, 2, 5, 4
+--   2 (eq):      0, 3, 5, 1
+--   3 (eq):      0, 4, 5, 2
+--   4 (eq):      0, 1, 5, 3
+--   5 (bottom):  1, 2, 3, 4
+--
+-- Dart numbering: vertex v has darts {4v, 4v+1, 4v+2, 4v+3}.
+-- Cyclic order of darts at vertex v determined by the neighbor list above.
+--
+-- The 12 edges (with their 2 darts each) — α swaps them:
+--   edge 0-1 : darts (0, 4)    → α(0)=4
+--   edge 0-2 : darts (1, 8)    → α(1)=8
+--   edge 0-3 : darts (2, 12)   → α(2)=12
+--   edge 0-4 : darts (3, 16)   → α(3)=16
+--   edge 1-2 : darts (5, 11)   → α(5)=11
+--   edge 1-5 : darts (6, 20)   → α(6)=20
+--   edge 1-4 : darts (7, 17)   → α(7)=17
+--   edge 2-3 : darts (9, 15)   → α(9)=15
+--   edge 2-5 : darts (10, 21)  → α(10)=21
+--   edge 3-4 : darts (13, 19)  → α(13)=19
+--   edge 3-5 : darts (14, 22)  → α(14)=22
+--   edge 4-5 : darts (18, 23)  → α(18)=23
+
+/-- The octahedron as a CombinatorialMap: V=6, E=12, F=8 → V-E+F = 2. -/
+def octahedronMap : CombinatorialMap (Fin 24) where
+  -- edgePerm: swap dart pairs for each of 12 edges
+  edgePerm :=
+    Equiv.swap 0 4   * Equiv.swap 1 8   * Equiv.swap 2 12 *
+    Equiv.swap 3 16  * Equiv.swap 5 11  * Equiv.swap 6 20 *
+    Equiv.swap 7 17  * Equiv.swap 9 15  * Equiv.swap 10 21 *
+    Equiv.swap 13 19 * Equiv.swap 14 22 * Equiv.swap 18 23
+  -- vertexPerm: each vertex has 4 darts in cyclic order (4-cycles)
+  -- vertex v: (4v, 4v+1, 4v+2, 4v+3) → 4v → 4v+1 → 4v+2 → 4v+3 → 4v
+  vertexPerm :=
+    Equiv.swap 0 1   * Equiv.swap 1 2   * Equiv.swap 2 3 *    -- v0
+    Equiv.swap 4 5   * Equiv.swap 5 6   * Equiv.swap 6 7 *    -- v1
+    Equiv.swap 8 9   * Equiv.swap 9 10  * Equiv.swap 10 11 *  -- v2
+    Equiv.swap 12 13 * Equiv.swap 13 14 * Equiv.swap 14 15 *  -- v3
+    Equiv.swap 16 17 * Equiv.swap 17 18 * Equiv.swap 18 19 *  -- v4
+    Equiv.swap 20 21 * Equiv.swap 21 22 * Equiv.swap 22 23    -- v5
+  facePerm :=
+    (Equiv.swap 0 1   * Equiv.swap 1 2   * Equiv.swap 2 3 *
+     Equiv.swap 4 5   * Equiv.swap 5 6   * Equiv.swap 6 7 *
+     Equiv.swap 8 9   * Equiv.swap 9 10  * Equiv.swap 10 11 *
+     Equiv.swap 12 13 * Equiv.swap 13 14 * Equiv.swap 14 15 *
+     Equiv.swap 16 17 * Equiv.swap 17 18 * Equiv.swap 18 19 *
+     Equiv.swap 20 21 * Equiv.swap 21 22 * Equiv.swap 22 23)⁻¹ *
+    (Equiv.swap 0 4   * Equiv.swap 1 8   * Equiv.swap 2 12 *
+     Equiv.swap 3 16  * Equiv.swap 5 11  * Equiv.swap 6 20 *
+     Equiv.swap 7 17  * Equiv.swap 9 15  * Equiv.swap 10 21 *
+     Equiv.swap 13 19 * Equiv.swap 14 22 * Equiv.swap 18 23)⁻¹
+  face_mul_edge_mul_vertex_eq_one := by
+    simp [mul_assoc, inv_mul_cancel]
+  edgePerm_involutive := by native_decide
+  isEmpty_fixedPoints_edgePerm := by
+    refine ⟨fun ⟨d, hd⟩ => ?_⟩
+    fin_cases d <;> simp [Function.fixedPoints] at hd
+
+-- Verify orbit counts (kernel)
+example : Fintype.card (octahedronMap.Vertex) = 6 := by native_decide
+example : Fintype.card (octahedronMap.Edge)   = 12 := by native_decide
+example : Fintype.card (octahedronMap.Face)   = 8 := by native_decide
+
+/-- The octahedron map is spherical: matches PlanarGraph 6 12 8. -/
+theorem octahedronMap_isSpherical : octahedronMap.IsSpherical :=
+  ⟨6, 12, 8, PlanarGraph.octahedron,
+    by native_decide, by native_decide, by native_decide⟩
+
+/-- The octahedron is planar: V - E + F = 6 - 12 + 8 = 2 ✓ -/
+theorem octahedronMap_isPlanar : octahedronMap.IsPlanar :=
+  octahedronMap.eulerChar_of_spherical octahedronMap_isSpherical
