@@ -479,6 +479,54 @@ example : PlanarGraph 5 9 6 := doubleWheel_planar 3 (by omega)
 example : PlanarGraph 6 12 8 := doubleWheel_planar 4 (by omega)
 example : PlanarGraph 7 15 10 := doubleWheel_planar 5 (by omega)
 
+-- ============================================================
+-- LADDER L_n: two parallel paths connected by n rungs
+-- ============================================================
+-- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
+-- (n-1 quadrilateral cells + 1 outer face)
+
+/-- Ladder L_n: V = 2n, E = 3n - 2, F = n (for n ≥ 2). -/
+theorem ladder_planar (n : ℕ) (hn : 2 ≤ n) :
+    PlanarGraph (2 * n) (3 * n - 2) n := by
+  -- Start from K_{2,2} = ladder L_2: V=4, E=4, F=2
+  -- Actually K_{2,2} corresponds to a 4-cycle, not a ladder.
+  -- Build inductively from L_2:
+  --   L_2: a 4-cycle (V=4, E=4, F=2) — but that's NOT the right shape.
+  -- Correct base: L_2 = single rung K_2 ⊔ second K_2 connected by 2 verticals
+  --              That's a 4-cycle: V=4, E=4, F=2.
+  --
+  -- Inductive step: L_{n+1} = L_n + 2 leaves (2 new vertices) + 1 closing edge
+  -- (V: 2n → 2n+2, E: 3n-2 → 3n+1 = 3(n+1)-2, F: n → n+1)
+  induction n, hn using Nat.le_induction with
+  | base =>
+    -- L_2: 4-cycle. V=4, E=4, F=2. 3·2 - 2 = 4 ✓
+    have : 3 * 2 - 2 = 4 := by omega
+    rw [this]
+    exact cycle_planar 4 (by omega)
+  | succ k hk ih =>
+    -- We have L_k: PlanarGraph (2k) (3k-2) k
+    -- Want L_{k+1}: PlanarGraph (2(k+1)) (3(k+1)-2) (k+1) = PlanarGraph (2k+2) (3k+1) (k+1)
+    -- Apply: addLeaf (V=2k+1, E=3k-1, F=k), addLeaf (V=2k+2, E=3k, F=k),
+    --        addEdge (V=2k+2, E=3k+1, F=k+1)
+    have h1 : PlanarGraph (2 * k + 1) (3 * k - 1) k := by
+      have := PlanarGraph.addLeaf (2 * k) (3 * k - 2) k ih
+      have he : 3 * k - 2 + 1 = 3 * k - 1 := by omega
+      rw [he] at this; exact this
+    have h2 : PlanarGraph (2 * k + 2) (3 * k) k := by
+      have := PlanarGraph.addLeaf (2 * k + 1) (3 * k - 1) k h1
+      have he : 3 * k - 1 + 1 = 3 * k := by omega
+      rw [he] at this; exact this
+    have h3 : PlanarGraph (2 * k + 2) (3 * k + 1) (k + 1) :=
+      .addEdge (2 * k + 2) (3 * k) k h2
+    have hv : 2 * (k + 1) = 2 * k + 2 := by ring
+    have he : 3 * (k + 1) - 2 = 3 * k + 1 := by omega
+    rw [hv, he]; exact h3
+
+-- Ladder examples
+example : PlanarGraph 4 4 2 := ladder_planar 2 (by omega)    -- L_2 = C_4
+example : PlanarGraph 6 7 3 := ladder_planar 3 (by omega)
+example : PlanarGraph 8 10 4 := ladder_planar 4 (by omega)
+
 end PlanarGraph
 
 -- ============================================================
