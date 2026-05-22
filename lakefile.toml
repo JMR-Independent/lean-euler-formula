@@ -30,4 +30,4 @@ name = "IsPlanarIffIsSpherical"
 name = "GeometricEmbedding"
 
 [[lean_lib]]
-name = "CycleDoubleCover"
+name = "Hypermap"
