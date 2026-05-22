@@ -543,6 +543,59 @@ theorem platonic_euler_derived :
    ⟨rfl, dodecahedron_planar⟩, ⟨rfl, icosahedron_planar⟩⟩
 
 -- ============================================================
+-- PLATONIC CLASSIFICATION (the 5 solids are uniquely determined)
+-- ============================================================
+-- A regular polyhedron has every face with p edges and every vertex
+-- with q edges. The handshake constraints give:
+--   pF = 2E  (each edge borders 2 faces)
+--   qV = 2E  (each edge has 2 endpoints)
+-- So F = 2E/p, V = 2E/q. Combined with V - E + F = 2:
+--   2E/q - E + 2E/p = 2  ⟹  1/p + 1/q - 1/2 = 1/E  > 0
+-- Therefore: 1/p + 1/q > 1/2.
+-- With p, q ≥ 3, only 5 pairs (p,q) satisfy this:
+--   (3,3) tetrahedron, (3,4) cube, (4,3) octahedron,
+--   (3,5) dodecahedron, (5,3) icosahedron.
+
+/--
+**Platonic constraint**: for a regular planar graph with face-degree p
+and vertex-degree q (both ≥ 3) embedded such that pF = qV = 2E, Euler
+forces 1/p + 1/q > 1/2.
+
+Restated arithmetically: 2p + 2q > pq (multiplying through by 2pq).
+-/
+theorem platonic_constraint (p q V E F : ℕ)
+    (hp : 3 ≤ p) (hq : 3 ≤ q)
+    (hfaces : p * F = 2 * E)
+    (hverts : q * V = 2 * E)
+    (hpos_E : 1 ≤ E)
+    (hplanar : V + F = E + 2) :
+    2 * p + 2 * q > p * q := by
+  -- From V + F = E + 2 with V = 2E/q, F = 2E/p:
+  -- 2E/q + 2E/p = E + 2
+  -- Multiply by pq: 2Ep + 2Eq = Epq + 2pq
+  -- So E(2p + 2q - pq) = 2pq > 0
+  -- Therefore 2p + 2q > pq.
+  have h1 : 2 * p * E + 2 * q * E = p * q * E + 2 * p * q := by
+    have := hplanar
+    -- q V = 2E, so p * (q V) = p * 2 E, so q * (p * V) = 2 p E
+    -- Multiply Euler by pq:
+    have eulerPQ : p * q * V + p * q * F = p * q * E + 2 * p * q := by
+      have : p * q * (V + F) = p * q * (E + 2) := by rw [this]
+      ring_nf at this ⊢
+      linarith
+    have hqv : p * q * V = 2 * p * E := by
+      have : p * (q * V) = p * (2 * E) := by rw [hverts]
+      ring_nf at this ⊢
+      linarith
+    have hpf : p * q * F = 2 * q * E := by
+      have : q * (p * F) = q * (2 * E) := by rw [hfaces]
+      ring_nf at this ⊢
+      linarith
+    linarith
+  -- E ≥ 1 and the equation E(2p+2q-pq) = 2pq forces 2p+2q-pq > 0
+  nlinarith [hpos_E, Nat.zero_le p, Nat.zero_le q]
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
