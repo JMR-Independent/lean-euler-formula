@@ -731,29 +731,12 @@ theorem girth_planarity_bound (v e f g : ℕ)
     e * (g - 2) ≤ g * (v - 2) := by
   have hE := euler_formula h
   have hF := face_pos h
-  -- Euler: v + f = e + 2, so f = e + 2 - v.
-  -- Multiply by g: g·f = g·e + 2g - g·v
-  -- With g·f ≤ 2e: g·e + 2g - g·v ≤ 2e
-  -- So (g-2)e ≤ g·v - 2g = g(v-2).
-  -- Need v ≥ 2 for v-2 to behave; we have v ≥ 3.
-  -- Also need g ≥ 2 for g-2 to behave; we have g ≥ 3.
-  have hv2 : 2 ≤ v := by omega
-  have hg2 : 2 ≤ g := by omega
-  -- Compute g * f from Euler equation
-  have h_gf : g * f + g * v = g * e + 2 * g := by
-    have : g * (v + f) = g * (e + 2) := by rw [hE]
-    ring_nf at this ⊢
-    omega
-  -- Combine with hface
-  have h_ge : g * e + 2 * g ≤ 2 * e + g * v := by omega
-  -- Rearrange: (g - 2) * e ≤ g * (v - 2)
-  have hgmul : g * v - 2 * g = g * (v - 2) := by
-    rw [Nat.mul_sub_one]
-    omega
-  have hemul : g * e - 2 * e = e * (g - 2) := by
-    rw [Nat.mul_sub_one]
-    ring_nf; omega
-  omega
+  -- Euler v + f = e + 2; multiply by g: g·v + g·f = g·e + 2·g
+  -- With g·f ≤ 2·e: g·v + 2·e ≥ g·v + g·f = g·e + 2·g
+  -- So g·e - 2·e ≤ g·v - 2·g, i.e. e(g-2) ≤ g(v-2).
+  -- All nat-distributivity handled by omega given the hypotheses.
+  have hmul : g * (v + f) = g * (e + 2) := by rw [hE]
+  nlinarith [hmul, hface, hv, hg, hF]
 
 -- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
