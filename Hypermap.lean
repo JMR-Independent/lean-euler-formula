@@ -105,6 +105,33 @@ theorem skipPerm_fixed_at_r (π : Equiv.Perm (Fin (n+1)))
     skipPerm π r r = r := by
   rw [skipPerm_of_fixed π r hr, hr]
 
+/-- The image of `skipPerm π r` never equals `r` for `d ≠ r`, provided
+    `r` is the only dart π sends to `r` (which holds when π is a bijection). -/
+theorem skipPerm_image_ne_r (π : Equiv.Perm (Fin (n+1)))
+    (r d : Fin (n+1)) (hd : d ≠ r) :
+    skipPerm π r d ≠ r := by
+  unfold skipPerm
+  by_cases h : π d = r
+  · -- π d = r → skipPerm π r d = π (π d) = π r
+    simp [h]
+    intro hcontra
+    -- π r = r would force d = r (π injective)
+    exact hd (π.injective (h.trans hcontra.symm))
+  · -- π d ≠ r → skipPerm π r d = π d ≠ r
+    simp [h]; exact h
+
+/-- For a full involution π fixing r as a 2-cycle endpoint, walkup makes
+    sense: every `d ≠ r` has both `π d ≠ r` (after skipping) and double
+    application returns d. -/
+theorem skipPerm_involutive_safe (π : Equiv.Perm (Fin (n+1)))
+    (hinv : Function.Involutive π)
+    (r d : Fin (n+1)) (hd : d ≠ r) (hr_fixed : π r = r) :
+    skipPerm π r (skipPerm π r d) = d := by
+  -- When π r = r, skipPerm π r = π exactly (block 3)
+  rw [skipPerm_of_fixed π r hr_fixed]
+  rw [skipPerm_of_fixed π r hr_fixed]
+  exact hinv d
+
 end CombinatorialMap
 
 /-! ## Status
