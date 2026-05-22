@@ -65,6 +65,28 @@ theorem skipPerm_fixes_two_cycle (π : Equiv.Perm (Fin (n+1)))
   · simp [hpr]
   · simp [hpr]; exact h
 
+/-- If `d` is mapped by `π` to a non-removed dart, `skipPerm` agrees with `π`. -/
+theorem skipPerm_eq_orig (π : Equiv.Perm (Fin (n+1)))
+    (r d : Fin (n+1)) (h : π d ≠ r) :
+    skipPerm π r d = π d := by
+  unfold skipPerm; simp [h]
+
+/-- If `π d = r`, then `skipPerm π r d = π (π d) = π r`. -/
+theorem skipPerm_chase (π : Equiv.Perm (Fin (n+1)))
+    (r d : Fin (n+1)) (h : π d = r) :
+    skipPerm π r d = π r := by
+  unfold skipPerm; simp [h]
+
+/-- For an involution π, skipPerm at r preserves involutivity at non-r darts:
+    if π d ≠ r and π (skipPerm π r d) ≠ r, then iterating twice returns d. -/
+theorem skipPerm_involutive_aux (π : Equiv.Perm (Fin (n+1)))
+    (hinv : Function.Involutive π)
+    (r d : Fin (n+1)) (hd : π d ≠ r) (h2 : π (π d) ≠ r) :
+    skipPerm π r (skipPerm π r d) = d := by
+  rw [skipPerm_eq_orig π r d hd]
+  rw [skipPerm_eq_orig π r (π d) h2]
+  exact hinv d
+
 end CombinatorialMap
 
 /-! ## Status
