@@ -472,6 +472,43 @@ theorem CombinatorialMap.eulerChar_via_vanStaudt
   have := M.euler_via_vanStaudt hV hF hPart
   omega
 
+/-! ## Block 15: Concrete walkup verification on singleEdgeMap
+
+Apply collapseEdge to the actual edgePerm of singleEdgeMap and verify
+the result fixes both darts. This is the smallest concrete test of
+our Walkup infrastructure.
+-/
+
+namespace SingleEdgeWalkupTest
+
+/-- Apply collapseEdge to singleEdgeMap's edgePerm at dart 0. -/
+def collapsedEdge : Fin 2 → Fin 2 :=
+  CombinatorialMap.collapseEdge singleEdgeMap.edgePerm ⟨0, by decide⟩
+
+/-- After collapse, dart 0 is fixed. -/
+theorem collapsed_fixes_0 : collapsedEdge ⟨0, by decide⟩ = ⟨0, by decide⟩ := by
+  unfold collapsedEdge
+  exact CombinatorialMap.collapseEdge_fixes_r _ _
+
+/-- After collapse, dart 1 (the edge partner) is also fixed. -/
+theorem collapsed_fixes_1 : collapsedEdge ⟨1, by decide⟩ = ⟨1, by decide⟩ := by
+  unfold collapsedEdge
+  -- We need to show: collapseEdge edgePerm 0 (edgePerm 0) = edgePerm 0
+  -- edgePerm of singleEdgeMap is swap, so edgePerm 0 = 1
+  have h_eq : singleEdgeMap.edgePerm ⟨0, by decide⟩ = ⟨1, by decide⟩ := by
+    native_decide
+  rw [← h_eq]
+  exact CombinatorialMap.collapseEdge_fixes_pr _ _
+
+/-- After collapse, the result is the identity (since both darts are fixed). -/
+theorem collapsed_is_identity : ∀ d, collapsedEdge d = d := by
+  intro d
+  fin_cases d
+  · exact collapsed_fixes_0
+  · exact collapsed_fixes_1
+
+end SingleEdgeWalkupTest
+
 
 
 /-! ## Status
