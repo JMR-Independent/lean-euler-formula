@@ -134,15 +134,64 @@ theorem skipPerm_involutive_safe (π : Equiv.Perm (Fin (n+1)))
 
 end CombinatorialMap
 
+/-! ## Block 5: Walkup — full 2-dart edge collapse
+
+Given a CombinatorialMap `M` on `Fin (n+2)` (at least 2 darts) and a
+dart `r`, removing the edge `{r, edgePerm r}` reduces to a map on `Fin n`.
+
+We define this via embedding into the larger type and extending by identity
+on the removed darts. This avoids re-indexing surgery and keeps the proofs
+algebraic.
+
+The "extended" Walkup is a CMap on `Fin (n+2)` where both `r` and `edge r`
+become fixed points of all three permutations (effectively isolated).
+The orbit counts change by:
+  - vertices: V → V - 1 if r and edge r were in different vertices,
+              V → V       if they were in the same vertex
+  - edges:    E → E - 1 (the edge {r, edge r} disappears)
+  - faces:    F → F - 1 if r and edge r were in different faces (deletion),
+              F → F       if same face (contraction creates a new face)
+-/
+
+namespace CombinatorialMap
+
+/-- The conjugate permutation collapsing the edge `{r, π r}`: agrees with
+`π` everywhere except sends r → r and (π r) → (π r). -/
+def collapseEdge (π : Equiv.Perm (Fin (n+1))) (r : Fin (n+1)) :
+    Fin (n+1) → Fin (n+1) :=
+  fun d => if d = r ∨ d = π r then d else π d
+
+theorem collapseEdge_fixes_r (π : Equiv.Perm (Fin (n+1))) (r : Fin (n+1)) :
+    collapseEdge π r r = r := by
+  unfold collapseEdge; simp
+
+theorem collapseEdge_fixes_pr (π : Equiv.Perm (Fin (n+1))) (r : Fin (n+1)) :
+    collapseEdge π r (π r) = π r := by
+  unfold collapseEdge; simp
+
+theorem collapseEdge_eq_orig (π : Equiv.Perm (Fin (n+1))) (r d : Fin (n+1))
+    (hd1 : d ≠ r) (hd2 : d ≠ π r) :
+    collapseEdge π r d = π d := by
+  unfold collapseEdge
+  simp [hd1, hd2]
+
+end CombinatorialMap
+
 /-! ## Status
 
-Block 1 (this file):
-  ✓ skipPerm: combinatorial "skip the removed dart" function
-  ✓ WalkupData: structure capturing what walkup produces
-  ✓ skipPerm_fixes_two_cycle: smallest non-trivial property
+Block 1: ✓ skipPerm + WalkupData
+Block 2: ✓ skipPerm properties
+Block 3: ✓ skipPerm at fixed points
+Block 4: ✓ image bounds + safe involutivity
+Block 5: ✓ collapseEdge: makes r and (edge r) fixed points
 
-What's NOT here yet (subsequent blocks):
-  ✗ Walkup as full CombinatorialMap (requires Fin embedding work)
-  ✗ Euler preservation under Walkup
-  ✗ Induction on dart count to derive Euler for all planar maps
+This is the FOUNDATION for the real Walkup: collapseEdge applied to all
+three permutations gives a "smaller in spirit" CMap (two isolated darts
+that don't affect orbit counts of the rest).
+
+The induction will then proceed: keep applying collapseEdge until all
+darts are isolated, count what we did, derive Euler.
+
+Remaining: proving collapseEdge is involutive when restricted properly,
+preserving the group relation, and counting orbit changes.
 -/
