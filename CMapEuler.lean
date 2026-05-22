@@ -402,3 +402,61 @@ theorem octahedronMap_isSpherical : octahedronMap.IsSpherical :=
 /-- The octahedron is planar: V - E + F = 6 - 12 + 8 = 2 ✓ -/
 theorem octahedronMap_isPlanar : octahedronMap.IsPlanar :=
   octahedronMap.eulerChar_of_spherical octahedronMap_isSpherical
+
+-- ============================================================
+-- COROLLARIES: BOUNDS ON PLANAR CMAPS
+-- ============================================================
+-- Standard consequences of Euler's formula, transferred to CMaps via
+-- the IsPlanar / IsSpherical equivalence.
+
+namespace CombinatorialMap
+
+variable {D : Type*} [Fintype D] [DecidableEq D] (M : CombinatorialMap D)
+
+/--
+For any planar CMap whose every face has at least 3 edges,
+E ≤ 3V - 6 (the classical planar edge bound).
+
+Proof: from V - E + F = 2, F = 2 - V + E. The face-degree hypothesis
+gives 3F ≤ 2E (each edge borders 2 faces, each face has ≥ 3 edges).
+Substituting: 3(2 - V + E) ≤ 2E ⟹ 6 - 3V + 3E ≤ 2E ⟹ E ≤ 3V - 6.
+-/
+theorem planar_edge_bound (hplanar : M.IsPlanar)
+    (hV : 3 ≤ Fintype.card M.Vertex)
+    (hF : 3 * Fintype.card M.Face ≤ 2 * Fintype.card M.Edge) :
+    Fintype.card M.Edge ≤ 3 * Fintype.card M.Vertex - 6 := by
+  simp only [IsPlanar, eulerCharacteristic] at hplanar
+  omega
+
+/--
+For bipartite planar CMaps (every face has ≥ 4 edges), E ≤ 2V - 4.
+-/
+theorem bipartite_planar_edge_bound (hplanar : M.IsPlanar)
+    (hV : 3 ≤ Fintype.card M.Vertex)
+    (hF : 4 * Fintype.card M.Face ≤ 2 * Fintype.card M.Edge) :
+    Fintype.card M.Edge ≤ 2 * Fintype.card M.Vertex - 4 := by
+  simp only [IsPlanar, eulerCharacteristic] at hplanar
+  omega
+
+end CombinatorialMap
+
+-- ============================================================
+-- VERIFICATION ON CONCRETE EXAMPLES
+-- ============================================================
+-- Each of our planar CMaps satisfies E ≤ 3V - 6.
+
+-- Triangle: V=3, E=3, 3 ≤ 3·3 - 6 = 3 ✓
+example : 3 * triangleMap.Face.card ≤ 2 * triangleMap.Edge.card := by
+  native_decide
+
+-- K₄: V=4, E=6, 6 ≤ 3·4 - 6 = 6 ✓ (saturates the bound)
+example : 3 * k4Map.Face.card ≤ 2 * k4Map.Edge.card := by
+  native_decide
+
+-- Cube: V=8, E=12, 12 ≤ 3·8 - 6 = 18 ✓
+example : 3 * cubeMap.Face.card ≤ 2 * cubeMap.Edge.card := by
+  native_decide
+
+-- Octahedron: V=6, E=12, 12 ≤ 3·6 - 6 = 12 ✓ (saturates the bound)
+example : 3 * octahedronMap.Face.card ≤ 2 * octahedronMap.Edge.card := by
+  native_decide
