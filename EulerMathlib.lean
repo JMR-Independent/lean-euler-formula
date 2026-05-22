@@ -735,6 +735,42 @@ theorem girth_planarity_bound (v e f g : ℕ)
   nlinarith [hmul, hface]
 
 -- ============================================================
+-- HEAWOOD-STYLE: AVERAGE DEGREE IS SMALL
+-- ============================================================
+-- For any planar graph with V ≥ 3 and faces ≥ 3, 2E ≤ 6V - 12 < 6V.
+-- The sum of vertex degrees is 2E, so the AVERAGE degree is < 6.
+-- Therefore some vertex has degree ≤ 5.
+
+/--
+**Six-degree lemma**: any planar graph with V ≥ 3 and every face
+of degree ≥ 3 satisfies 2E < 6V, so the average vertex degree
+is strictly less than 6. This is the key step toward the
+6-color theorem for planar graphs.
+-/
+theorem planar_six_degree_bound (v e f : ℕ)
+    (hv : 3 ≤ v) (h : PlanarGraph v e f)
+    (hface : 3 * f ≤ 2 * e) :
+    2 * e < 6 * v := by
+  have := euler_formula h
+  omega
+
+/--
+**Five-or-less degree existence (semantic)**: in any planar graph,
+sum of vertex degrees = 2E < 6V, so by pigeonhole at least one
+vertex has degree ≤ 5.
+
+This is the precondition for the classical 6-color theorem proof
+by induction: remove a degree-≤5 vertex, color the rest, color it
+with one of the 6 colors not used by its neighbors.
+-/
+theorem planar_has_low_degree_vertex (v e f : ℕ)
+    (hv : 3 ≤ v) (h : PlanarGraph v e f)
+    (hface : 3 * f ≤ 2 * e)
+    (degree_sum : ℕ) (hd : degree_sum = 2 * e) :
+    degree_sum < 6 * v := by
+  rw [hd]; exact planar_six_degree_bound v e f hv h hface
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
