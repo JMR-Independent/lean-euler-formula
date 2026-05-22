@@ -261,6 +261,41 @@ theorem walkupAt_eq_orig (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ d : Fin (n+1))
     walkupAt π r₁ r₂ d = π d := by
   unfold walkupAt; simp [h₁, h₂]
 
+/-! ## Block 9: The walkup-image-safety lemma
+
+If π is a bijection that maps {r₁, r₂} to itself (i.e., r₁ ↦ r₂ and r₂ ↦ r₁,
+or both fixed), then π preserves the complement of {r₁, r₂}.
+
+In our setting, we need the original permutations to FIX both r₁ and r₂
+for the walkup to be a clean modification. This is a strong assumption,
+captured here as `MapsFixedPair`.
+-/
+
+/-- `π` fixes the pair `{r₁, r₂}` pointwise: both are fixed points of `π`. -/
+def MapsFixedPair (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ : Fin (n+1)) : Prop :=
+  π r₁ = r₁ ∧ π r₂ = r₂
+
+/-- If π fixes both r₁ and r₂, then walkupAt π r₁ r₂ = π everywhere. -/
+theorem walkupAt_of_fixed (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ : Fin (n+1))
+    (h : MapsFixedPair π r₁ r₂) :
+    ∀ d, walkupAt π r₁ r₂ d = π d := by
+  intro d
+  by_cases h₁ : d = r₁
+  · subst h₁; rw [walkupAt_fixes_r₁]; exact h.1.symm
+  by_cases h₂ : d = r₂
+  · subst h₂; rw [walkupAt_fixes_r₂]; exact h.2.symm
+  exact walkupAt_eq_orig π r₁ r₂ d h₁ h₂
+
+/-- The image of walkupAt π r₁ r₂ stays away from {r₁, r₂} for d ≠ r₁, r₂,
+provided π also fixes {r₁, r₂} pointwise. -/
+theorem walkupAt_image_safe (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ d : Fin (n+1))
+    (h : MapsFixedPair π r₁ r₂) (h₁ : d ≠ r₁) (h₂ : d ≠ r₂) :
+    walkupAt π r₁ r₂ d ≠ r₁ ∧ walkupAt π r₁ r₂ d ≠ r₂ := by
+  rw [walkupAt_eq_orig π r₁ r₂ d h₁ h₂]
+  refine ⟨?_, ?_⟩
+  · intro hcontra; exact h₁ (π.injective (hcontra.trans h.1.symm))
+  · intro hcontra; exact h₂ (π.injective (hcontra.trans h.2.symm))
+
 end CombinatorialMap
 
 /-! ## Status
