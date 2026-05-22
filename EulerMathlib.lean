@@ -102,6 +102,40 @@ theorem k33_not_planar : ¬ ∃ f, PlanarGraph 6 9 f ∧ 4 * f ≤ 2 * 9 := by
 theorem square : PlanarGraph 4 4 2 :=
   .addEdge 4 3 1 (.addLeaf 3 2 1 (.addLeaf 2 1 1 (.addLeaf 1 0 1 .point)))
 
+-- ============================================================
+-- SUBDIVISION INVARIANCE
+-- ============================================================
+-- Subdividing an edge (adding a vertex in the middle) preserves Euler.
+-- Operation: V → V+1, E → E+1, F unchanged.
+-- Equivalent to one `addLeaf` step in our inductive type.
+
+/--
+**Subdivision invariance**: subdividing an edge of a planar graph
+preserves Euler's formula. (V, E, F) → (V+1, E+1, F) keeps V+F = E+2.
+-/
+theorem subdivide_preserves_euler {v e f : ℕ}
+    (h : PlanarGraph v e f) :
+    PlanarGraph (v + 1) (e + 1) f :=
+  .addLeaf v e f h
+
+/--
+Subdivision applied k times: V → V+k, E → E+k, F unchanged.
+-/
+theorem subdivide_k_times {v e f : ℕ} (h : PlanarGraph v e f) (k : ℕ) :
+    PlanarGraph (v + k) (e + k) f := by
+  induction k with
+  | zero => exact h
+  | succ k ih => exact .addLeaf (v + k) (e + k) f ih
+
+-- ============================================================
+-- DUAL EULER (just relabel via Euler is symmetric in V, F)
+-- ============================================================
+
+/-- Euler is symmetric in V and F: V + F = E + 2 = F + V. -/
+theorem euler_swap_VF {v e f : ℕ} (h : PlanarGraph v e f) :
+    f + v = e + 2 := by
+  have := euler_formula h; omega
+
 end PlanarGraph
 
 -- ============================================================
