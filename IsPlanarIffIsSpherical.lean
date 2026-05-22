@@ -1,6 +1,12 @@
 /-
   IsPlanar ↔ IsSpherical for connected CombinatorialMaps
 
+  Scope: this file establishes equivalence between two *combinatorial*
+  notions of planarity — `IsPlanar` (eulerCharacteristic = 2) and
+  `IsSpherical` (existence of a `PlanarGraph` witness with matching V/E/F).
+  Topological planarity in ℝ² via the Jordan Curve Theorem is outside
+  the scope of this formalization.
+
   The key insight: any (V, E, F) with V ≥ 1 and V + F = E + 2 has a
   PlanarGraph witness. This is proved by simple induction on E:
   - E = 0: V = 1, F = 1 → point
@@ -12,8 +18,6 @@
 
   Combined with eulerChar_of_spherical (IsSpherical → IsPlanar),
   this gives the full equivalence: IsPlanar ↔ IsSpherical.
-
-  No Jordan curve theorem, no spanning trees, no topology needed.
 -/
 import CMapEuler
 import Completeness
