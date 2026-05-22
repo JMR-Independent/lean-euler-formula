@@ -146,12 +146,10 @@ without crossings satisfies our `IsPlanar` — is **not** closed. This
 would require the Jordan curve theorem, which has not been formalized
 in Lean 4 / Mathlib (only in HOL Light by Harrison, 59,000 lines).
 
-A separate experimental repository
-(https://github.com/JMR-Independent/lean-euler-jordan-free) explores
-Van Staudt's interdigitating spanning tree argument as a possible
-Jordan-free route. The arithmetic core (`vanStaudt_arith`) compiles,
-but the substantive combinatorial work of constructing spanning trees
-is not yet implemented.
+As an alternative Jordan-free route, `vanStaudt_arith` in
+EulerMathlib.lean isolates the purely combinatorial content of Van
+Staudt's spanning-tree argument. The substantive work of constructing
+the actual spanning trees is not implemented.
 
 ## Comparison with prior work
 
