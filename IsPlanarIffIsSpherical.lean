@@ -114,6 +114,47 @@ theorem torusCMap_not_isSpherical : ¬ torusCMap.IsSpherical := by
     (by simp [IsPlanar, eulerCharacteristic]; native_decide)
 
 /--
+**Parametric ↔ Concrete bridge for the cube.**
+`cubeMap.IsPlanar` is witnessed via the parametric `prism_planar 4`
+rather than only the hardcoded `PlanarGraph.cube` witness.
+This demonstrates the framework accepts witnesses from any source.
+-/
+theorem cubeMap_isPlanar_via_prism : cubeMap.IsPlanar := by
+  apply cubeMap.eulerChar_of_spherical
+  refine ⟨8, 12, 6, ?_, ?_, ?_, ?_⟩
+  · -- prism_planar 4 gives PlanarGraph (2·4) (3·4) (4+2) = PlanarGraph 8 12 6
+    have h := PlanarGraph.prism_planar 4 (by omega)
+    exact h
+  · native_decide
+  · native_decide
+  · native_decide
+
+/--
+**Parametric ↔ Concrete bridge for the octahedron.**
+`octahedronMap.IsPlanar` via `antiprism_planar 3` (triangular antiprism = octahedron).
+-/
+theorem octahedronMap_isPlanar_via_antiprism : octahedronMap.IsPlanar := by
+  apply octahedronMap.eulerChar_of_spherical
+  refine ⟨6, 12, 8, ?_, ?_, ?_, ?_⟩
+  · have h := PlanarGraph.antiprism_planar 3 (by omega)
+    exact h
+  · native_decide
+  · native_decide
+  · native_decide
+
+/--
+**Parametric ↔ Concrete bridge for the triangle.**
+`triangleMap.IsPlanar` via `cycle_planar 3`.
+-/
+theorem triangleMap_isPlanar_via_cycle : triangleMap.IsPlanar := by
+  apply triangleMap.eulerChar_of_spherical
+  refine ⟨3, 3, 2, ?_, ?_, ?_, ?_⟩
+  · exact PlanarGraph.cycle_planar 3 (by omega)
+  · native_decide
+  · native_decide
+  · native_decide
+
+/--
 Verification: all five concrete planar CMaps in this development satisfy
 the equivalence by giving explicit IsSpherical witnesses.
 
