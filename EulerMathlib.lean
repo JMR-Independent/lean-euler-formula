@@ -352,6 +352,55 @@ theorem min_edges_planar {v e f : ℕ} (h : PlanarGraph v e f) :
   have := face_pos h
   omega
 
+-- ============================================================
+-- N-GONAL PRISMS
+-- ============================================================
+-- An n-gonal prism has two parallel n-gons connected by n vertical edges.
+-- V = 2n, E = 3n (2n cycle edges + n verticals), F = n + 2 (n sides + 2 caps)
+
+/-- Construct an n-gonal prism: 2 parallel n-cycles + n connecting edges. -/
+theorem prism_planar (n : ℕ) (hn : 3 ≤ n) :
+    PlanarGraph (2 * n) (3 * n) (n + 2) := by
+  -- Strategy: start from one n-cycle, extend to a path of vertices for the
+  -- second copy, add the cycle-closing edge, then add (n-1) more edges to
+  -- complete the second cycle and split faces.
+  -- V: 2n vertices total
+  -- E: 3n edges total
+  -- F: n + 2 faces total (n quadrilateral sides + top + bottom)
+  --
+  -- Build: cycle_planar n + n leaves + n closing edges + (n-1) more edges
+  have hcycle : PlanarGraph n n 2 := cycle_planar n hn
+  -- Add n leaves (one per vertex of the cycle)
+  -- After: V = 2n, E = 2n, F = 2
+  have h1 : PlanarGraph (2 * n) (2 * n) 2 := by
+    have hlift := add_leaves_aux n n 2 hcycle n
+    have : n + n = 2 * n := by ring
+    rw [this] at hlift
+    exact hlift
+  -- Add n more edges, each splits a face: V unchanged, E += n, F += n
+  -- After: V = 2n, E = 3n, F = n + 2
+  have h2 := add_edges_aux (2 * n) (2 * n) 2 h1 n
+  have he : 2 * n + n = 3 * n := by ring
+  have hf : 2 + n = n + 2 := by omega
+  rw [he, hf] at h2
+  exact h2
+where
+  add_leaves_aux (v e f : ℕ) (h : PlanarGraph v e f) (k : ℕ) :
+      PlanarGraph (v + k) (e + k) f := by
+    induction k with
+    | zero => exact h
+    | succ k ih => exact .addLeaf (v + k) (e + k) f ih
+  add_edges_aux (v e f : ℕ) (h : PlanarGraph v e f) (k : ℕ) :
+      PlanarGraph v (e + k) (f + k) := by
+    induction k with
+    | zero => exact h
+    | succ k ih => exact .addEdge v (e + k) (f + k) ih
+
+-- Prism examples
+example : PlanarGraph 6 9 5  := prism_planar 3 (by omega)   -- triangular prism
+example : PlanarGraph 8 12 6 := prism_planar 4 (by omega)   -- cube (square prism)
+example : PlanarGraph 10 15 7 := prism_planar 5 (by omega)  -- pentagonal prism
+
 end PlanarGraph
 
 -- ============================================================
