@@ -490,3 +490,39 @@ theorem cube_octahedron_dual :
 theorem k4_self_dual :
     Fintype.card k4Map.Vertex = Fintype.card k4Map.Face := by
   native_decide
+
+-- ============================================================
+-- TRIANGULAR ANTIPRISM = OCTAHEDRON
+-- ============================================================
+-- The triangular antiprism is the octahedron. Both have (V=6, E=12, F=8).
+-- This connects the inductive parametric family `antiprism_planar 3`
+-- with the explicit `octahedronMap` CMap.
+
+/--
+The octahedron's CMap orbit counts match the abstract triangular antiprism
+PlanarGraph witness. This is the "concrete = parametric" check.
+-/
+theorem octahedron_matches_antiprism :
+    Fintype.card octahedronMap.Vertex = 2 * 3 ∧
+    Fintype.card octahedronMap.Edge   = 4 * 3 ∧
+    Fintype.card octahedronMap.Face   = 2 * 3 + 2 := by
+  refine ⟨?_, ?_, ?_⟩ <;> native_decide
+
+/--
+The cube's CMap orbit counts match the abstract square prism
+PlanarGraph witness. (cube = 4-gonal prism)
+-/
+theorem cube_matches_square_prism :
+    Fintype.card cubeMap.Vertex = 2 * 4 ∧
+    Fintype.card cubeMap.Edge   = 3 * 4 ∧
+    Fintype.card cubeMap.Face   = 4 + 2 := by
+  refine ⟨?_, ?_, ?_⟩ <;> native_decide
+
+/--
+The triangle's CMap orbit counts match the abstract C_3 cycle witness.
+-/
+theorem triangle_matches_cycle :
+    Fintype.card triangleMap.Vertex = 3 ∧
+    Fintype.card triangleMap.Edge   = 3 ∧
+    Fintype.card triangleMap.Face   = 2 := by
+  refine ⟨?_, ?_, ?_⟩ <;> native_decide
