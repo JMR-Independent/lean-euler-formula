@@ -1133,7 +1133,7 @@ private theorem isPetersenEdge_irrefl (i : Fin 10) :
 def petersenGraph : SimpleGraph (Fin 10) where
   Adj i j  := isPetersenEdge i j = true
   symm     := isPetersenEdge_symm
-  loopless := isPetersenEdge_irrefl
+  loopless := ⟨isPetersenEdge_irrefl⟩
 
 instance : DecidableRel petersenGraph.Adj :=
   fun i j => Bool.decEq (isPetersenEdge i j) true
@@ -1188,7 +1188,7 @@ private theorem isHeawoodEdge_irrefl (i : Fin 14) :
 def heawoodGraph : SimpleGraph (Fin 14) where
   Adj i j  := isHeawoodEdge i j = true
   symm     := isHeawoodEdge_symm
-  loopless := isHeawoodEdge_irrefl
+  loopless := ⟨isHeawoodEdge_irrefl⟩
 
 instance : DecidableRel heawoodGraph.Adj :=
   fun i j => Bool.decEq (isHeawoodEdge i j) true
