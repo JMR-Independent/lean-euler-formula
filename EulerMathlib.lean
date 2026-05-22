@@ -1110,3 +1110,85 @@ theorem K5_not_planarly_embeddable :
   rintro ⟨⟨f, h⟩, hf⟩
   simp [Kn_vertices, K5_edges] at h
   exact PlanarGraph.k5_not_planar ⟨f, h, hf⟩
+
+-- ============================================================
+-- PETERSEN GRAPH: FORMAL NON-PLANARITY
+-- ============================================================
+
+private def isPetersenEdge (i j : Fin 10) : Bool :=
+  (i.val, j.val) ∈ ([(0,1),(1,0),(1,2),(2,1),(2,3),(3,2),(3,4),(4,3),(4,0),(0,4),
+                      (5,7),(7,5),(7,9),(9,7),(9,6),(6,9),(6,8),(8,6),(8,5),(5,8),
+                      (0,5),(5,0),(1,6),(6,1),(2,7),(7,2),(3,8),(8,3),(4,9),(9,4)]
+                     : List (ℕ × ℕ))
+
+/-- The Petersen graph: 3-regular on 10 vertices, 15 edges, girth 5. -/
+def petersenGraph : SimpleGraph (Fin 10) where
+  Adj i j  := isPetersenEdge i j = true
+  symm     := by native_decide
+  loopless := by native_decide
+
+instance : DecidableRel petersenGraph.Adj :=
+  fun i j => Bool.decEq (isPetersenEdge i j) true
+
+theorem Petersen_edges : petersenGraph.edgeFinset.card = 15 := by native_decide
+
+/--
+**Petersen graph is not planarly embeddable.**
+The graph is concretely defined (outer pentagon 0-1-2-3-4-0, inner pentagram
+5-7-9-6-8-5, spokes 0-5…4-9) with edge count machine-verified. Any planar
+embedding would force F=7 faces each of size ≥5 (girth 5), but 5·7=35 > 30.
+
+This is the fully formal counterpart of `petersen_not_planar`, following
+the same chain as `K5_not_planarly_embeddable`.
+-/
+theorem petersenGraph_not_planarly_embeddable :
+    ¬ ∃ (emb : PlanarEmbedding petersenGraph),
+        5 * emb.faces ≤ 2 * 15 := by
+  rintro ⟨⟨f, h⟩, hf⟩
+  simp only [Kn_vertices, Petersen_edges] at h
+  exact PlanarGraph.petersen_not_planar ⟨f, h, hf⟩
+
+-- ============================================================
+-- HEAWOOD GRAPH: FORMAL NON-PLANARITY
+-- ============================================================
+
+private def isHeawoodEdge (i j : Fin 14) : Bool :=
+  (i.val, j.val) ∈ ([(0,1),(1,0),(0,5),(5,0),(0,9),(9,0),
+                      (1,2),(2,1),(1,12),(12,1),
+                      (2,3),(3,2),(2,7),(7,2),
+                      (3,4),(4,3),(3,10),(10,3),
+                      (4,5),(5,4),(4,13),(13,4),
+                      (5,6),(6,5),
+                      (6,7),(7,6),(6,11),(11,6),
+                      (7,8),(8,7),
+                      (8,9),(9,8),(8,13),(13,8),
+                      (9,10),(10,9),
+                      (10,11),(11,10),
+                      (11,12),(12,11),
+                      (12,13),(13,12)]
+                     : List (ℕ × ℕ))
+
+/-- The Heawood graph: 3-regular on 14 vertices, 21 edges, girth 6. -/
+def heawoodGraph : SimpleGraph (Fin 14) where
+  Adj i j  := isHeawoodEdge i j = true
+  symm     := by native_decide
+  loopless := by native_decide
+
+instance : DecidableRel heawoodGraph.Adj :=
+  fun i j => Bool.decEq (isHeawoodEdge i j) true
+
+theorem Heawood_edges : heawoodGraph.edgeFinset.card = 21 := by native_decide
+
+/--
+**Heawood graph is not planarly embeddable.**
+The graph is concretely defined with edge count machine-verified. Any planar
+embedding would force F=9 faces each of size ≥6 (girth 6), but 6·9=54 > 42.
+
+Fully formal counterpart of `heawood_not_planar`.
+-/
+theorem heawoodGraph_not_planarly_embeddable :
+    ¬ ∃ (emb : PlanarEmbedding heawoodGraph),
+        6 * emb.faces ≤ 2 * 21 := by
+  rintro ⟨⟨f, h⟩, hf⟩
+  simp only [Kn_vertices, Heawood_edges] at h
+  exact PlanarGraph.heawood_not_planar ⟨f, h, hf⟩
