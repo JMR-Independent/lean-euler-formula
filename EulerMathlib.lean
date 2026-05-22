@@ -136,6 +136,37 @@ theorem euler_swap_VF {v e f : ℕ} (h : PlanarGraph v e f) :
     f + v = e + 2 := by
   have := euler_formula h; omega
 
+-- ============================================================
+-- TREES: SPECIAL CASE F = 1
+-- ============================================================
+-- A tree is a connected planar graph with only the outer face (F=1).
+-- For a tree: V + 1 = E + 2, so E = V - 1 (when V ≥ 1).
+
+/-- Trees (F=1) satisfy E = V - 1 when V ≥ 1. -/
+theorem tree_edge_count {v e : ℕ} (hv : 1 ≤ v) (h : PlanarGraph v e 1) :
+    e = v - 1 := by
+  have := euler_formula h; omega
+
+/-- Construct a path with v vertices (a tree, F=1, E=v-1). -/
+theorem path_planar (v : ℕ) (hv : 1 ≤ v) : PlanarGraph v (v - 1) 1 := by
+  induction v with
+  | zero => omega
+  | succ n ih =>
+    rcases Nat.eq_zero_or_pos n with rfl | hpos
+    · simpa using PlanarGraph.point
+    · have := ih hpos
+      have h := PlanarGraph.addLeaf n (n - 1) 1 this
+      have : n + 1 - 1 = n := by omega
+      rw [this]
+      have : n - 1 + 1 = n := by omega
+      rw [this] at h
+      exact h
+
+-- Path examples
+example : PlanarGraph 1 0 1 := path_planar 1 (by omega)
+example : PlanarGraph 5 4 1 := path_planar 5 (by omega)
+example : PlanarGraph 10 9 1 := path_planar 10 (by omega)
+
 end PlanarGraph
 
 -- ============================================================
