@@ -445,6 +445,40 @@ example : PlanarGraph 6 12 8 := antiprism_planar 3 (by omega)  -- = octahedron
 example : PlanarGraph 8 16 10 := antiprism_planar 4 (by omega)
 example : PlanarGraph 10 20 12 := antiprism_planar 5 (by omega)
 
+-- ============================================================
+-- DOUBLE WHEEL DW_n: two hubs sharing the same n-cycle rim
+-- ============================================================
+-- DW_n: V = n + 2 (n rim + 2 hubs), E = 3n (n rim + 2n spokes),
+--      F = 2n + 1 (2n triangular faces from spokes + 1 outer cycle face)
+-- Wait, need to recount: with 2 hubs and n-cycle, F = 2n (n above + n below)
+-- Then V + F = E + 2: (n+2) + 2n = 3n + 2 ✓
+
+/-- Double wheel DW_n: V = n+2, E = 3n, F = 2n. -/
+theorem doubleWheel_planar (n : ℕ) (hn : 3 ≤ n) :
+    PlanarGraph (n + 2) (3 * n) (2 * n) := by
+  -- Start from W_n: V=n+1, E=2n, F=n+1 (one hub + n-cycle)
+  have hwheel : PlanarGraph (n + 1) (2 * n) (n + 1) := wheel_planar n hn
+  -- Add second hub as a leaf
+  have h1 : PlanarGraph (n + 2) (2 * n + 1) (n + 1) :=
+    .addLeaf (n + 1) (2 * n) (n + 1) hwheel
+  -- Add (n - 1) more spoke edges (each splits a face)
+  have h2 := add_edges_aux (n + 2) (2 * n + 1) (n + 1) h1 (n - 1)
+  have he : 2 * n + 1 + (n - 1) = 3 * n := by omega
+  have hf : n + 1 + (n - 1) = 2 * n := by omega
+  rw [he, hf] at h2
+  exact h2
+where
+  add_edges_aux (v e f : ℕ) (h : PlanarGraph v e f) (k : ℕ) :
+      PlanarGraph v (e + k) (f + k) := by
+    induction k with
+    | zero => exact h
+    | succ k ih => exact .addEdge v (e + k) (f + k) ih
+
+-- Double wheel examples
+example : PlanarGraph 5 9 6 := doubleWheel_planar 3 (by omega)
+example : PlanarGraph 6 12 8 := doubleWheel_planar 4 (by omega)
+example : PlanarGraph 7 15 10 := doubleWheel_planar 5 (by omega)
+
 end PlanarGraph
 
 -- ============================================================
