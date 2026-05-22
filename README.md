@@ -4,7 +4,7 @@ Formalization of **V - E + F = 2** for planar graphs, built with
 Lean 4 + Mathlib. Provides fully verified concrete witnesses alongside
 the combinatorial-map approach proposed in mathlib4 PR #16074.
 
-100 theorems and definitions, 1675 lines of code, **0 sorry**,
+Over 100 theorems and definitions across 6 files, **0 sorry**,
 CI green on every commit.
 
 ## Quick reference
@@ -12,150 +12,110 @@ CI green on every commit.
 | Result | File | Description |
 |---|---|---|
 | `euler_formula` | EulerMathlib | V + F = E + 2 for any PlanarGraph |
-| `euler_int` | EulerMathlib | Signed form: V - E + F = 2 |
 | `vanStaudt_arith` | EulerMathlib | Arithmetic core of a Jordan-free route |
-| `edge_count_eq` | Completeness | |Edge| = |D|/2 for any fixed-point-free involution |
+| `edge_count_eq` | Completeness | \|Edge\| = \|D\|/2 for any fixed-point-free involution |
 | `eulerChar_of_spherical` | CMapEuler | IsSpherical → IsPlanar |
 | `isSpherical_iff_isPlanar` | IsPlanarIffIsSpherical | Equivalence between the two internal notions of planarity used in this project |
-| `torusCMap_not_isSpherical` | IsPlanarIffIsSpherical | A formally verified mathematical consequence: a connected CMap on the torus is not spherical |
+| `euler_via_vanStaudt` | Hypermap | Jordan-free Euler theorem for any CMap with valid partition |
+| `torusCMap_fails_vanStaudt` | Hypermap | The torus CMap fails the Van Staudt partition |
 
-## File breakdown
+## Files
 
-### `EulerMathlib.lean` (611 lines)
+### `EulerMathlib.lean`
 
-Defines `PlanarGraph V E F` as an inductive proposition with three
-constructors corresponding to elementary planar operations:
+Inductive `PlanarGraph V E F` type with three constructors
+(`point`, `addLeaf`, `addEdge`). `euler_formula` follows by structural
+induction.
 
-- `point`: a single vertex (V=1, E=0, F=1)
-- `addLeaf`: attach a pendant vertex (V+1, E+1, F)
-- `addEdge`: split a face by adding an edge (V, E+1, F+1)
-
-The main theorem `euler_formula` proves V + F = E + 2 by structural
-induction; each case closes by `omega`.
-
-**Nine parametric families** (one theorem per family covers infinitely
-many graphs):
-- `path_planar n`: path on n vertices
-- `star_planar n`: star K_{1,n}
-- `cycle_planar n`: cycle C_n
-- `wheel_planar n`: wheel W_n
-- `k2n_planar n`: complete bipartite K_{2,n}
-- `prism_planar n`: n-gonal prism
-- `antiprism_planar n`: n-gonal antiprism
-- `doubleWheel_planar n`: double wheel DW_n
-- `ladder_planar n`: ladder L_n
+**Nine parametric families** (one theorem covers infinitely many graphs):
+`path_planar`, `star_planar`, `cycle_planar`, `wheel_planar`,
+`k2n_planar`, `prism_planar`, `antiprism_planar`,
+`doubleWheel_planar`, `ladder_planar`.
 
 **Hardcoded examples**: triangle, K₄, cube, octahedron, square.
 
-**Structural theorems**:
-- `vertex_pos`, `face_pos`: V, F ≥ 1
-- `edge_le_vertex_plus_face`: E ≤ V + F - 2
-- `no_edges_iff_point`, `one_face_iff_tree`
-- `subdivide_preserves_euler`, `subdivide_k_times`
-- `euler_swap_VF`, `glue_preserves_euler`
-- `max_edges_planar`, `min_edges_planar`
-- `tree_edge_count`, `triangulation_edges`
+**Structural theorems**: vertex/face positivity, subdivision invariance,
+gluing, tree characterization, edge bounds.
 
 **Non-planarity**: `k5_not_planar`, `k33_not_planar`,
-`K5_not_planarly_embeddable` (via Mathlib's SimpleGraph).
+`K5_not_planarly_embeddable`.
 
-### `CMapEuler.lean` (528 lines)
+**Jordan-free arithmetic core**: `vanStaudt_arith` proves V+F=E+2 from
+the spanning-tree partition hypothesis (V-1)+(F-1) = E.
+
+### `CMapEuler.lean`
 
 Replicates the `CombinatorialMap` structure from mathlib4 PR #16074
-verbatim. A combinatorial map is a finite set of darts with three
-permutations satisfying `face * edge * vertex = 1`, where `edge` is
-a fixed-point-free involution.
+verbatim. Defines `IsSpherical` as the bridge to `PlanarGraph` and
+proves five concrete maps satisfy `IsPlanar` via `native_decide`:
+- `singleEdgeMap` (2 darts, V=2, E=1, F=1)
+- `triangleMap` (6 darts, V=3, E=3, F=2)
+- `k4Map` (12 darts, V=4, E=6, F=4)
+- `cubeMap` (24 darts, V=8, E=12, F=6)
+- `octahedronMap` (24 darts, V=6, E=12, F=8)
 
-Defines `IsSpherical M ↔ ∃ V E F, PlanarGraph V E F ∧ |M.Vertex| = V
-∧ |M.Edge| = E ∧ |M.Face| = F`. The bridge theorem
-`eulerChar_of_spherical` proves IsSpherical → IsPlanar
-(eulerCharacteristic = 2).
+Includes `planar_edge_bound`, `bipartite_planar_edge_bound`,
+duality observations (`cube_octahedron_dual`, `k4_self_dual`),
+and concrete-to-parametric bridges.
 
-**Five concrete CMaps verified IsPlanar via `native_decide`**:
-- `singleEdgeMap`: 2 darts, 1 edge between 2 vertices (V=2, E=1, F=1)
-- `triangleMap`: 6 darts, triangle K₃ (V=3, E=3, F=2)
-- `k4Map`: 12 darts, complete graph K₄ (V=4, E=6, F=4)
-- `cubeMap`: 24 darts, cube (V=8, E=12, F=6)
-- `octahedronMap`: 24 darts, octahedron (V=6, E=12, F=8)
-
-**Edge bounds for CMaps**:
-- `planar_edge_bound`: E ≤ 3V - 6 with face-degree hypothesis
-- `bipartite_planar_edge_bound`: E ≤ 2V - 4 for bipartite faces
-
-**Polyhedral observations**:
-- `cube_octahedron_dual`: V_cube=F_octa, E_cube=E_octa, F_cube=V_octa
-- `k4_self_dual`: K₄ has V = F
-- `octahedron_matches_antiprism`, `cube_matches_square_prism`,
-  `triangle_matches_cycle`: concrete = parametric
-
-### `Completeness.lean` (240 lines)
+### `Completeness.lean`
 
 Proves `edge_count_eq`: for any CombinatorialMap with a fixed-point-free
-involution `edge`, the number of edges equals |D|/2. The proof uses:
+involution, the number of edges equals \|D\|/2 (fiber decomposition
+using SameCycle and edgePerm² = 1).
 
-- `edgePerm_no_fixedPoint`, `edgePerm_support_eq_univ`
-- `edgePerm_sq`: edge² = 1
-- `edgePerm_cycleType_mem`: all cycle lengths equal 2
-- `edgePerm_sameCycle_iff`: SameCycle iff in same 2-element orbit
-- `edgePerm_fiber_card`: each orbit has exactly 2 elements
-- Final: fiber decomposition |D| = Σ_e 2 = 2|Edge|
+Includes `torusCMap`: a valid connected CMap on 4 darts with
+eulerCharacteristic = 0. A formally verified mathematical consequence
+showing connectivity alone does not imply planarity.
 
-Includes `torusCMap`: a valid connected CMap on 4 darts (V=1, E=2, F=1,
-eulerChar = 0). This is a formally verified mathematical consequence
-showing that connectivity alone does not imply planarity — the genus
-matters.
+### `IsPlanarIffIsSpherical.lean`
 
-### `IsPlanarIffIsSpherical.lean` (174 lines)
+Proves `isSpherical_iff_isPlanar` for any connected CombinatorialMap.
+The hard direction uses `PlanarGraph.ofEuler` to construct a witness
+from the Euler equation alone, without topology or Jordan curve theorem.
 
-Proves `isSpherical_iff_isPlanar` for any connected CombinatorialMap:
-an equivalence between the two internal notions of planarity used in
-this project (`IsPlanar` = eulerCharacteristic = 2, and `IsSpherical`
-= existence of a `PlanarGraph` witness with matching orbit counts).
+Includes parametric-witness bridges:
+`cubeMap_isPlanar_via_prism`,
+`octahedronMap_isPlanar_via_antiprism`,
+`triangleMap_isPlanar_via_cycle`.
 
-The hard direction (IsPlanar → IsSpherical) uses `PlanarGraph.ofEuler`:
-from V ≥ 1 and V + F = E + 2, construct a PlanarGraph witness by
-induction on E:
-- E = 0: must be `point` (V=1, F=1)
-- E > 0, V > 1: use `addLeaf`
-- E > 0, V = 1: use `addEdge`
+### `GeometricEmbedding.lean`
 
-This equivalence is purely algebraic and does not require the Jordan
-curve theorem, spanning trees, or topology.
+Explicit ℝ² coordinates for `singleEdgeMap`, `triangleMap`, and
+`k4Map`. Distinct-vertex theorems verified by `norm_num`.
 
-Concrete consequences:
-- `torusCMap_not_isSpherical`: the torus CMap fails the equivalence
-  (consistent with the genus-0 hypothesis being essential)
-- `all_examples_isSpherical_iff_isPlanar`: chain verified for all 5
-  concrete CMaps end-to-end
-- `cubeMap_isPlanar_via_prism`, `octahedronMap_isPlanar_via_antiprism`,
-  `triangleMap_isPlanar_via_cycle`: each concrete CMap proved IsPlanar
-  using a parametric PlanarGraph witness (alternative to the hardcoded one)
+### `Hypermap.lean` (Jordan-free approach in progress)
 
-### `GeometricEmbedding.lean` (122 lines)
+Infrastructure for the Dufourd/Gonthier-style hypermap reduction:
+- `skipPerm`, `collapseEdge`, `collapseEdgePerm`: permutation surgery
+- `walkupAt`, `MapsFixedPair`, `walkupAt_composition`: composition
+  preservation
+- `DufourdWalkupParameter`: framework for the inductive step
 
-Explicit ℝ² coordinates for the concrete CMaps:
-- `singleEdgeLayout`: endpoints (0,0) and (1,0)
-- `triangleLayout`: corners (0,0), (1,0), (1/2, 1)
-- `k4Layout`: triangle ABC with D inside
-
-Each layout satisfies `same_vertex_same_pos`: darts in the same vertex
-orbit get the same coordinates. Theorems like
-`triangle_layout_distinct_vertices` verify different vertices map to
-different points.
+**Concrete Jordan-free Euler results** (Block 12-14):
+- `singleEdgeMap_vanStaudt`, `triangleMap_vanStaudt`, `k4Map_vanStaudt`,
+  `cubeMap_vanStaudt`, `octahedronMap_vanStaudt`: each concrete planar
+  CMap satisfies the Van Staudt partition
+- `*_euler_jordan_free`: V+F=E+2 derived purely arithmetically for each
+- `torusCMap_fails_vanStaudt`: torus explicitly fails the partition
+- `euler_via_vanStaudt`, `eulerChar_via_vanStaudt`: general reusable
+  theorems for any CMap satisfying the partition hypothesis
 
 ## Scope
 
 This project formalizes the combinatorial side of Euler's formula:
-internal notions of planarity, concrete examples, structural
-theorems, and parametric families.
+internal notions of planarity, concrete examples, structural theorems,
+parametric families, and a Jordan-free derivation for explicit CMaps.
 
-The connection between these internal notions and topological
-planarity (embeddability in ℝ² without crossings) would require the
-Jordan curve theorem, which is not currently formalized in Lean 4 or
-Mathlib. As an alternative Jordan-free route, `vanStaudt_arith` in
-EulerMathlib.lean isolates the purely combinatorial content of Van
-Staudt's spanning-tree argument. The substantive work of constructing
-the actual spanning trees is left for future work.
+For arbitrary connected planar CMaps, constructing the spanning-tree
+partition algorithmically (rather than verifying it by `native_decide`
+on concrete instances) remains the substantive work ahead — this is
+what would close the gap completely.
+
+The connection to topological planarity (embeddability in ℝ² without
+crossings) ultimately requires either the Jordan curve theorem
+(not currently formalized in Lean 4 / Mathlib) or the Walkup-reduction
+machinery (under development in `Hypermap.lean`).
 
 ## Related work
 
@@ -166,7 +126,7 @@ the actual spanning trees is left for future work.
 | Isabelle (Bauer & Nipkow 2002) | Triangulations |
 | Mathlib4 PR #16074 | Combinatorial map structure (open) |
 | Mathlib4 PR #29639 | Homological algebra approach (closed) |
-| **This repo** | Inductive PlanarGraph + concrete CMap witnesses |
+| **This repo** | Inductive PlanarGraph + concrete CMap witnesses + Jordan-free arithmetic core |
 
 ## Build
 
