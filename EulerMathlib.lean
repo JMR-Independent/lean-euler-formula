@@ -711,6 +711,50 @@ theorem heawood_not_planar
   have := euler_formula hpg
   omega
 
+/--
+**General girth-based non-planarity**:
+A planar graph with V ≥ 3 vertices, E edges, and minimum face-degree
+g ≥ 3 satisfies the bound E·(g - 2) ≤ g·(V - 2).
+
+Equivalently: E ≤ g·(V-2)/(g-2). When this is violated, the graph
+cannot be planar.
+
+For g = 3: E ≤ 3V - 6 (the classical bound).
+For g = 4: E ≤ 2V - 4 (bipartite bound).
+For g = 5: E ≤ 5(V-2)/3 (Petersen-style bound).
+For g = 6: E ≤ 3(V-2)/2 (Heawood-style bound).
+-/
+theorem girth_planarity_bound (v e f g : ℕ)
+    (hv : 3 ≤ v) (hg : 3 ≤ g)
+    (h : PlanarGraph v e f)
+    (hface : g * f ≤ 2 * e) :
+    e * (g - 2) ≤ g * (v - 2) := by
+  have hE := euler_formula h
+  have hF := face_pos h
+  -- Euler: v + f = e + 2, so f = e + 2 - v.
+  -- Multiply by g: g·f = g·e + 2g - g·v
+  -- With g·f ≤ 2e: g·e + 2g - g·v ≤ 2e
+  -- So (g-2)e ≤ g·v - 2g = g(v-2).
+  -- Need v ≥ 2 for v-2 to behave; we have v ≥ 3.
+  -- Also need g ≥ 2 for g-2 to behave; we have g ≥ 3.
+  have hv2 : 2 ≤ v := by omega
+  have hg2 : 2 ≤ g := by omega
+  -- Compute g * f from Euler equation
+  have h_gf : g * f + g * v = g * e + 2 * g := by
+    have : g * (v + f) = g * (e + 2) := by rw [hE]
+    ring_nf at this ⊢
+    omega
+  -- Combine with hface
+  have h_ge : g * e + 2 * g ≤ 2 * e + g * v := by omega
+  -- Rearrange: (g - 2) * e ≤ g * (v - 2)
+  have hgmul : g * v - 2 * g = g * (v - 2) := by
+    rw [Nat.mul_sub_one]
+    omega
+  have hemul : g * e - 2 * e = e * (g - 2) := by
+    rw [Nat.mul_sub_one]
+    ring_nf; omega
+  omega
+
 -- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
