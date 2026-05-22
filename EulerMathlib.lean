@@ -527,6 +527,31 @@ example : PlanarGraph 4 4 2 := ladder_planar 2 (by omega)    -- L_2 = C_4
 example : PlanarGraph 6 7 3 := ladder_planar 3 (by omega)
 example : PlanarGraph 8 10 4 := ladder_planar 4 (by omega)
 
+-- ============================================================
+-- VAN STAUDT'S ARITHMETIC CORE (Jordan-free)
+-- ============================================================
+-- Classical fact: V - E + F = 2 follows arithmetically from the
+-- spanning-tree decomposition without invoking Jordan curve theorem.
+--
+-- If a spanning tree of G has V-1 edges, and the complementary edges
+-- form a spanning tree of the dual G* with F-1 edges, and together
+-- they partition all E edges, then V + F = E + 2 follows immediately.
+
+/--
+Van Staudt's arithmetic identity: if a graph's edges partition into
+a spanning tree (V-1 edges) and a dual spanning tree (F-1 edges),
+then V + F = E + 2.
+
+This isolates the purely combinatorial content of Van Staudt's proof
+from any topological argument. The substantive remaining work is
+constructing the spanning trees themselves.
+-/
+theorem vanStaudt_arith (V E F : ℕ)
+    (hV : 1 ≤ V) (hF : 1 ≤ F)
+    (hpartition : (V - 1) + (F - 1) = E) :
+    V + F = E + 2 := by
+  omega
+
 end PlanarGraph
 
 -- ============================================================
