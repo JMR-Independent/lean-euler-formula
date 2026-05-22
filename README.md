@@ -13,6 +13,10 @@ CI green on every commit.
 |---|---|---|
 | `euler_formula` | EulerMathlib | V + F = E + 2 for any PlanarGraph |
 | `platonic_classification` | EulerMathlib | The 5 Platonic Solids Theorem (Wiedijk #38) |
+| `petersen_not_planar` | EulerMathlib | The Petersen graph is not planar |
+| `heawood_not_planar` | EulerMathlib | The Heawood graph is not planar |
+| `girth_planarity_bound` | EulerMathlib | General girth-based edge bound for planar graphs |
+| `planar_six_degree_bound` | EulerMathlib | 2E < 6V (key step toward 6-color theorem) |
 | `vanStaudt_arith` | EulerMathlib | Arithmetic core of a Jordan-free route |
 | `edge_count_eq` | Completeness | \|Edge\| = \|D\|/2 for any fixed-point-free involution |
 | `eulerChar_of_spherical` | CMapEuler | IsSpherical → IsPlanar |
@@ -33,13 +37,22 @@ induction.
 `k2n_planar`, `prism_planar`, `antiprism_planar`,
 `doubleWheel_planar`, `ladder_planar`.
 
-**Hardcoded examples**: triangle, K₄, cube, octahedron, square.
+**Hardcoded examples**: triangle, K₄, cube, octahedron, square,
+dodecahedron, icosahedron (all five Platonic solids).
 
 **Structural theorems**: vertex/face positivity, subdivision invariance,
 gluing, tree characterization, edge bounds.
 
 **Non-planarity**: `k5_not_planar`, `k33_not_planar`,
-`K5_not_planarly_embeddable`.
+`K5_not_planarly_embeddable`, `petersen_not_planar`, `heawood_not_planar`.
+
+**Platonic Solids Classification (Wiedijk #38)**: `platonic_constraint`,
+`platonic_pairs_classification`, `platonic_classification`. Proves the
+only regular planar polyhedra are tetrahedron, cube, octahedron,
+dodecahedron, icosahedron.
+
+**Girth bounds**: `girth_planarity_bound` (general),
+`planar_six_degree_bound` (toward 6-color theorem).
 
 **Jordan-free arithmetic core**: `vanStaudt_arith` proves V+F=E+2 from
 the spanning-tree partition hypothesis (V-1)+(F-1) = E.
