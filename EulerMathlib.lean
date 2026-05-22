@@ -675,6 +675,43 @@ theorem k33_non_planar_via_bipartite_bound
   omega
 
 -- ============================================================
+-- THE PETERSEN GRAPH IS NOT PLANAR
+-- ============================================================
+-- The Petersen graph: V=10, E=15, girth=5 (no triangles or 4-cycles).
+-- If planar, every face has ≥ 5 edges.
+-- Euler: F = 15 - 10 + 2 = 7.
+-- But 5·7 = 35 > 30 = 2·15, contradiction.
+
+/--
+**The Petersen graph is not planar.** Cubic graph on 10 vertices with
+girth 5; any planar embedding would force F=7 faces, each of length ≥5,
+but 5·7 = 35 > 2·15 = 2E, contradiction.
+-/
+theorem petersen_not_planar
+    (h_planar : ∃ f, PlanarGraph 10 15 f ∧ 5 * f ≤ 2 * 15) : False := by
+  obtain ⟨f, hpg, hf⟩ := h_planar
+  have := euler_formula hpg
+  omega
+
+-- ============================================================
+-- HEAWOOD GRAPH IS NOT PLANAR
+-- ============================================================
+-- The Heawood graph: V=14, E=21, girth=6.
+-- If planar: F = 21 - 14 + 2 = 9.
+-- But 6·9 = 54 > 42 = 2·21, contradiction.
+
+/--
+**The Heawood graph is not planar.** 3-regular on 14 vertices with girth 6
+(no triangles, 4-cycles, or 5-cycles); any planar embedding would force
+F=9 faces each of length ≥6, but 6·9 = 54 > 2·21 = 2E.
+-/
+theorem heawood_not_planar
+    (h_planar : ∃ f, PlanarGraph 14 21 f ∧ 6 * f ≤ 2 * 21) : False := by
+  obtain ⟨f, hpg, hf⟩ := h_planar
+  have := euler_formula hpg
+  omega
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
