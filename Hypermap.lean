@@ -175,6 +175,39 @@ theorem collapseEdge_eq_orig (π : Equiv.Perm (Fin (n+1))) (r d : Fin (n+1))
   unfold collapseEdge
   simp [hd1, hd2]
 
+/-- If π is involutive and d is neither r nor π r, then π d is also
+neither r nor π r (by injectivity). -/
+theorem collapseEdge_image_safe (π : Equiv.Perm (Fin (n+1)))
+    (hinv : Function.Involutive π) (r d : Fin (n+1))
+    (hd1 : d ≠ r) (hd2 : d ≠ π r) :
+    π d ≠ r ∧ π d ≠ π r := by
+  refine ⟨?_, ?_⟩
+  · -- π d = r would mean d = π r (apply π to both sides, use involutive)
+    intro h
+    apply hd2
+    have := congrArg π h
+    rw [hinv d] at this
+    exact this
+  · -- π d = π r would mean d = r (π injective)
+    intro h
+    exact hd1 (π.injective h)
+
+/-- collapseEdge preserves involutivity at darts disjoint from {r, π r}. -/
+theorem collapseEdge_involutive (π : Equiv.Perm (Fin (n+1)))
+    (hinv : Function.Involutive π) (r d : Fin (n+1)) :
+    collapseEdge π r (collapseEdge π r d) = d := by
+  by_cases h1 : d = r
+  · subst h1
+    rw [collapseEdge_fixes_r, collapseEdge_fixes_r]
+  by_cases h2 : d = π r
+  · subst h2
+    rw [collapseEdge_fixes_pr, collapseEdge_fixes_pr]
+  -- Generic case: d ≠ r and d ≠ π r
+  rw [collapseEdge_eq_orig π r d h1 h2]
+  obtain ⟨hne1, hne2⟩ := collapseEdge_image_safe π hinv r d h1 h2
+  rw [collapseEdge_eq_orig π r (π d) hne1 hne2]
+  exact hinv d
+
 end CombinatorialMap
 
 /-! ## Status
