@@ -486,7 +486,15 @@ example : PlanarGraph 7 15 10 := doubleWheel_planar 5 (by omega)
 -- Dodecahedron: V=20, E=30, F=12 (12 pentagonal faces)
 -- Icosahedron:  V=12, E=30, F=20 (20 triangular faces)
 
-/-- Dodecahedron as a PlanarGraph: V=20, E=30, F=12. -/
+/--
+Existence witness: there is a connected planar graph with V=20, E=30, F=12.
+These are the parameters of the dodecahedron (Euler: 20 + 12 = 30 + 2 ✓).
+
+Note: this construction (path + addEdge) produces *some* valid planar graph
+with those counts — not the actual dodecahedron (which has 12 pentagonal
+faces). The specific combinatorial structure of the dodecahedron is verified
+separately in `CMapEuler.lean` via `native_decide`.
+-/
 theorem dodecahedron_planar : PlanarGraph 20 30 12 := by
   -- Build inductively: start from point, add 19 leaves (V=20, E=19, F=1),
   -- then 11 addEdge operations to get to E=30, F=12.
@@ -503,7 +511,14 @@ where
     | zero => exact h
     | succ k ih => exact .addEdge v (e + k) (f + k) ih
 
-/-- Icosahedron as a PlanarGraph: V=12, E=30, F=20. -/
+/--
+Existence witness: there is a connected planar graph with V=12, E=30, F=20.
+These are the parameters of the icosahedron (Euler: 12 + 20 = 30 + 2 ✓).
+
+Note: this construction (path + addEdge) produces *some* valid planar graph
+with those counts — not the actual icosahedron (which has 20 triangular
+faces). See `dodecahedron_planar` for the same caveat.
+-/
 theorem icosahedron_planar : PlanarGraph 12 30 20 := by
   -- Build: path (V=12, E=11, F=1) + 19 addEdge ops → (V=12, E=30, F=20)
   have h1 : PlanarGraph 12 11 1 := path_planar 12 (by omega)
@@ -683,9 +698,15 @@ theorem k33_non_planar_via_bipartite_bound
 -- But 5·7 = 35 > 30 = 2·15, contradiction.
 
 /--
-**The Petersen graph is not planar.** Cubic graph on 10 vertices with
-girth 5; any planar embedding would force F=7 faces, each of length ≥5,
-but 5·7 = 35 > 2·15 = 2E, contradiction.
+No connected planar graph can have V=10, E=15, and all faces of size ≥5.
+
+The Petersen graph has exactly these parameters (V=10, E=15, girth=5), so
+if it were planarly embeddable then F=7 by Euler, but 5·7=35 > 2·15=30.
+
+Note: this theorem takes the face-size condition `5 * f ≤ 2 * 15` as a
+hypothesis. The Petersen graph is not formally defined here as a
+`SimpleGraph`; the theorem applies to any graph matching those parameters.
+For a fully formal statement see `K5_not_planarly_embeddable` as a model.
 -/
 theorem petersen_not_planar
     (h_planar : ∃ f, PlanarGraph 10 15 f ∧ 5 * f ≤ 2 * 15) : False := by
@@ -701,9 +722,13 @@ theorem petersen_not_planar
 -- But 6·9 = 54 > 42 = 2·21, contradiction.
 
 /--
-**The Heawood graph is not planar.** 3-regular on 14 vertices with girth 6
-(no triangles, 4-cycles, or 5-cycles); any planar embedding would force
-F=9 faces each of length ≥6, but 6·9 = 54 > 2·21 = 2E.
+No connected planar graph can have V=14, E=21, and all faces of size ≥6.
+
+The Heawood graph has exactly these parameters (V=14, E=21, girth=6), so
+if it were planarly embeddable then F=9 by Euler, but 6·9=54 > 2·21=42.
+
+Same caveat as `petersen_not_planar`: the face-size condition is a
+hypothesis, not a proved property of a formally defined Heawood graph.
 -/
 theorem heawood_not_planar
     (h_planar : ∃ f, PlanarGraph 14 21 f ∧ 6 * f ≤ 2 * 21) : False := by

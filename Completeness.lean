@@ -155,9 +155,9 @@ Inductive step (|D| ≥ 4): pick dart d, let d' = edgePerm d.
     IH on |D|-2 darts gives V+(F-1) = (|D|-2)/2 + 2.
     So V+F = |D|/2 + 2 ✓
 
-The remaining implementation challenge: formally defining the
-contracted/deleted CMap on D \ {d, d'} ≃ Fin (|D|-2) and showing
-its orbit counts change as stated. This is the only remaining sorry.
+The general case for arbitrary connected CMaps is not yet formalized here.
+Concrete instances (triangle, K₄, cube, octahedron) are verified via
+`IsSpherical` witnesses and `native_decide` in `CMapEuler.lean`.
 -/
 -- Helper: the group relation implies facePerm = vertexPerm⁻¹ * edgePerm⁻¹
 lemma facePerm_eq_inv_mul :

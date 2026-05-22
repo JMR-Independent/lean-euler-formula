@@ -12,7 +12,7 @@ No `sorry`. CI on every commit.
 |---|---|
 | `euler_formula` | V + F = E + 2 for any `PlanarGraph` |
 | `platonic_classification` | The five Platonic solids (Wiedijk #38) |
-| `petersen_not_planar`, `heawood_not_planar` | Non-planarity of two classical graphs |
+| `petersen_not_planar`, `heawood_not_planar` | Non-planarity via girth bounds (girth hypothesis is assumed, not proved) |
 | `girth_planarity_bound` | Edge bound from girth; implies K₅ and K₃,₃ cases |
 | `edge_count_eq` | \|E\| = \|D\|/2 for any fixed-point-free involution |
 | `eulerChar_of_spherical` | `IsSpherical → IsPlanar` via the CMap bridge |
@@ -23,9 +23,14 @@ No `sorry`. CI on every commit.
 ## Status
 
 The combinatorial side is complete: inductive `PlanarGraph`, nine parametric
-families, all five Platonic solids, non-planarity of K₅/K₃,₃/Petersen/Heawood,
-concrete CMap witnesses for triangle through octahedron, and a Jordan-free
-arithmetic derivation for explicit maps.
+families, Platonic solid classification, non-planarity of K₅ and K₃,₃
+(formally via `SimpleGraph`), concrete CMap witnesses for triangle through
+octahedron, and a Jordan-free arithmetic derivation for explicit maps.
+
+The Petersen and Heawood non-planarity results are proved conditionally: they
+show that no planar graph can have those vertex/edge counts with minimum face
+size ≥5 or ≥6 respectively, but those graphs are not formally defined as
+`SimpleGraph` instances here. K₅ has the fully formal treatment as a model.
 
 What remains: constructing the spanning-tree partition algorithmically for
 arbitrary CMaps (currently verified by `native_decide` on concrete instances),

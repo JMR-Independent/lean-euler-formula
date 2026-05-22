@@ -76,14 +76,19 @@ lemma vertex_pos_of_isPlanar (hplanar : M.IsPlanar) :
   exact ⟨⟦d⟧⟩
 
 /--
-**Main completeness theorem**: for any connected CombinatorialMap,
-`IsPlanar ↔ IsSpherical`.
+**Main completeness theorem**: `IsPlanar ↔ IsSpherical` for any
+`CombinatorialMap`.
 
 The hard direction (IsPlanar → IsSpherical) follows immediately from
 `PlanarGraph.ofEuler`: any (V, E, F) with V ≥ 1 and V + F = E + 2
 has a PlanarGraph witness, making the CMap spherical by definition.
 
 No topology, no Jordan curve theorem, no spanning trees needed.
+
+Note: `hconn` is not used in this proof — `IsPlanar` (eulerChar = 2)
+already forces the map to be non-empty and the Euler equation holds
+regardless of connectivity. The hypothesis is kept for API compatibility
+but may be removed in a future version.
 -/
 theorem isSpherical_iff_isPlanar (hconn : M.IsConnected) :
     M.IsSpherical ↔ M.IsPlanar := by
