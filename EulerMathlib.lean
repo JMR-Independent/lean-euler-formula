@@ -401,6 +401,50 @@ example : PlanarGraph 6 9 5  := prism_planar 3 (by omega)   -- triangular prism
 example : PlanarGraph 8 12 6 := prism_planar 4 (by omega)   -- cube (square prism)
 example : PlanarGraph 10 15 7 := prism_planar 5 (by omega)  -- pentagonal prism
 
+-- ============================================================
+-- STAR GRAPH K_{1,n} (tree with one center, n leaves)
+-- ============================================================
+-- Star K_{1,n}: V = n + 1, E = n, F = 1 (tree, single face).
+
+/-- Star graph K_{1,n}: one central vertex with n leaves. -/
+theorem star_planar (n : ℕ) : PlanarGraph (n + 1) n 1 := by
+  induction n with
+  | zero => exact .point
+  | succ k ih => exact .addLeaf (k + 1) k 1 ih
+
+-- Star examples
+example : PlanarGraph 1 0 1 := star_planar 0
+example : PlanarGraph 4 3 1 := star_planar 3
+example : PlanarGraph 11 10 1 := star_planar 10
+
+-- ============================================================
+-- ANTIPRISM A_n: two parallel n-gons connected by 2n triangles
+-- ============================================================
+-- V = 2n, E = 4n (2n cycle edges + 2n diagonals), F = 2n + 2
+
+/-- n-gonal antiprism: V = 2n, E = 4n, F = 2n + 2. -/
+theorem antiprism_planar (n : ℕ) (hn : 3 ≤ n) :
+    PlanarGraph (2 * n) (4 * n) (2 * n + 2) := by
+  -- Start from the n-gonal prism: V=2n, E=3n, F=n+2
+  have hprism : PlanarGraph (2 * n) (3 * n) (n + 2) := prism_planar n hn
+  -- Add n more edges (the diagonals), each splits a face
+  have h := add_edges_aux (2 * n) (3 * n) (n + 2) hprism n
+  have he : 3 * n + n = 4 * n := by ring
+  have hf : n + 2 + n = 2 * n + 2 := by ring
+  rw [he, hf] at h
+  exact h
+where
+  add_edges_aux (v e f : ℕ) (h : PlanarGraph v e f) (k : ℕ) :
+      PlanarGraph v (e + k) (f + k) := by
+    induction k with
+    | zero => exact h
+    | succ k ih => exact .addEdge v (e + k) (f + k) ih
+
+-- Antiprism examples
+example : PlanarGraph 6 12 8 := antiprism_planar 3 (by omega)  -- = octahedron
+example : PlanarGraph 8 16 10 := antiprism_planar 4 (by omega)
+example : PlanarGraph 10 20 12 := antiprism_planar 5 (by omega)
+
 end PlanarGraph
 
 -- ============================================================
