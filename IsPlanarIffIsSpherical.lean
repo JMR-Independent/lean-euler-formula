@@ -113,4 +113,21 @@ theorem torusCMap_not_isSpherical : ¬ torusCMap.IsSpherical := by
   exact torusCMap.eulerChar_of_spherical h |>.elim
     (by simp [IsPlanar, eulerCharacteristic]; native_decide)
 
+/--
+Verification: all five concrete planar CMaps in this development satisfy
+the equivalence by giving explicit IsSpherical witnesses.
+
+This is the end-to-end story:
+  PlanarGraph witness  ⟺  IsSpherical  ⟺  IsPlanar (= eulerChar = 2)
+-/
+theorem all_examples_isSpherical_iff_isPlanar :
+    (singleEdgeMap.IsSpherical ↔ singleEdgeMap.IsPlanar) ∧
+    (triangleMap.IsSpherical   ↔ triangleMap.IsPlanar) ∧
+    (k4Map.IsSpherical         ↔ k4Map.IsPlanar) ∧
+    (cubeMap.IsSpherical       ↔ cubeMap.IsPlanar) ∧
+    (octahedronMap.IsSpherical ↔ octahedronMap.IsPlanar) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
+    exact ⟨fun h => CombinatorialMap.eulerChar_of_spherical _ h,
+           fun h => ⟨_, _, _, _, rfl, rfl, rfl⟩⟩
+
 end CombinatorialMap
