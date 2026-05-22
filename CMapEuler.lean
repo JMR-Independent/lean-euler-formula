@@ -460,3 +460,33 @@ example : 3 * cubeMap.Face.card ≤ 2 * cubeMap.Edge.card := by
 -- Octahedron: V=6, E=12, 12 ≤ 3·6 - 6 = 12 ✓ (saturates the bound)
 example : 3 * octahedronMap.Face.card ≤ 2 * octahedronMap.Edge.card := by
   native_decide
+
+-- ============================================================
+-- DUALITY: CUBE ↔ OCTAHEDRON (combinatorial check)
+-- ============================================================
+-- The cube and octahedron are dual polyhedra:
+--   cube:       V=8, E=12, F=6
+--   octahedron: V=6, E=12, F=8
+-- Notice that V and F are swapped, E is preserved. This is the
+-- combinatorial signature of duality.
+
+/--
+Cube and octahedron have dual (V, E, F) signatures.
+This is the combinatorial fingerprint of polyhedral duality.
+-/
+theorem cube_octahedron_dual :
+    Fintype.card cubeMap.Vertex       = Fintype.card octahedronMap.Face ∧
+    Fintype.card cubeMap.Edge         = Fintype.card octahedronMap.Edge ∧
+    Fintype.card cubeMap.Face         = Fintype.card octahedronMap.Vertex := by
+  refine ⟨?_, ?_, ?_⟩ <;> native_decide
+
+-- ============================================================
+-- TETRAHEDRON = K₄ (self-dual)
+-- ============================================================
+-- The tetrahedron K₄ is the only self-dual platonic solid:
+-- V = F = 4, E = 6. Notice k4Map is in fact a tetrahedral embedding.
+
+/-- K₄ (= tetrahedron) is self-dual: V = F. -/
+theorem k4_self_dual :
+    Fintype.card k4Map.Vertex = Fintype.card k4Map.Face := by
+  native_decide
