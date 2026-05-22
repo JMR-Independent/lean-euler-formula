@@ -12,6 +12,7 @@ CI green on every commit.
 | Result | File | Description |
 |---|---|---|
 | `euler_formula` | EulerMathlib | V + F = E + 2 for any PlanarGraph |
+| `platonic_classification` | EulerMathlib | The 5 Platonic Solids Theorem (Wiedijk #38) |
 | `vanStaudt_arith` | EulerMathlib | Arithmetic core of a Jordan-free route |
 | `edge_count_eq` | Completeness | \|Edge\| = \|D\|/2 for any fixed-point-free involution |
 | `eulerChar_of_spherical` | CMapEuler | IsSpherical → IsPlanar |
