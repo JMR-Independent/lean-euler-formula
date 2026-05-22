@@ -434,6 +434,44 @@ theorem octahedronMap_euler_jordan_free :
   PlanarGraph.vanStaudt_arith _ _ _
     (by native_decide) (by native_decide) octahedronMap_vanStaudt
 
+/-! ## Block 14: A general Jordan-free Euler theorem for CMaps
+
+Package the Jordan-free derivation as a reusable theorem on any CMap
+with a Van Staudt partition.
+-/
+
+/--
+**Jordan-free Euler theorem for CombinatorialMaps**:
+Any CombinatorialMap M with V ≥ 1, F ≥ 1, and a valid Van Staudt
+partition (V-1)+(F-1) = E satisfies V + F = E + 2.
+
+No Jordan curve theorem used. The substantive content (constructing
+the spanning trees) is delegated to the partition hypothesis.
+-/
+theorem CombinatorialMap.euler_via_vanStaudt
+    {D : Type*} [Fintype D] [DecidableEq D] (M : CombinatorialMap D)
+    (hV : 1 ≤ Fintype.card M.Vertex)
+    (hF : 1 ≤ Fintype.card M.Face)
+    (hPart : (Fintype.card M.Vertex - 1) + (Fintype.card M.Face - 1) =
+             Fintype.card M.Edge) :
+    Fintype.card M.Vertex + Fintype.card M.Face =
+    Fintype.card M.Edge + 2 :=
+  PlanarGraph.vanStaudt_arith _ _ _ hV hF hPart
+
+/--
+Signed (integer) form of the Jordan-free Euler theorem for CMaps.
+-/
+theorem CombinatorialMap.eulerChar_via_vanStaudt
+    {D : Type*} [Fintype D] [DecidableEq D] (M : CombinatorialMap D)
+    (hV : 1 ≤ Fintype.card M.Vertex)
+    (hF : 1 ≤ Fintype.card M.Face)
+    (hPart : (Fintype.card M.Vertex - 1) + (Fintype.card M.Face - 1) =
+             Fintype.card M.Edge) :
+    M.eulerCharacteristic = 2 := by
+  simp only [CombinatorialMap.eulerCharacteristic]
+  have := M.euler_via_vanStaudt hV hF hPart
+  omega
+
 
 
 /-! ## Status
