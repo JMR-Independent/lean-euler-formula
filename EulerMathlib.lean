@@ -1121,11 +1121,19 @@ private def isPetersenEdge (i j : Fin 10) : Bool :=
                       (0,5),(5,0),(1,6),(6,1),(2,7),(7,2),(3,8),(8,3),(4,9),(9,4)]
                      : List (ℕ × ℕ))
 
+private theorem isPetersenEdge_symm (i j : Fin 10)
+    (h : isPetersenEdge i j = true) : isPetersenEdge j i = true := by
+  revert i j; native_decide
+
+private theorem isPetersenEdge_irrefl (i : Fin 10) :
+    isPetersenEdge i i ≠ true := by
+  revert i; native_decide
+
 /-- The Petersen graph: 3-regular on 10 vertices, 15 edges, girth 5. -/
 def petersenGraph : SimpleGraph (Fin 10) where
   Adj i j  := isPetersenEdge i j = true
-  symm     := by native_decide
-  loopless := by native_decide
+  symm     := isPetersenEdge_symm
+  loopless := isPetersenEdge_irrefl
 
 instance : DecidableRel petersenGraph.Adj :=
   fun i j => Bool.decEq (isPetersenEdge i j) true
@@ -1168,11 +1176,19 @@ private def isHeawoodEdge (i j : Fin 14) : Bool :=
                       (12,13),(13,12)]
                      : List (ℕ × ℕ))
 
+private theorem isHeawoodEdge_symm (i j : Fin 14)
+    (h : isHeawoodEdge i j = true) : isHeawoodEdge j i = true := by
+  revert i j; native_decide
+
+private theorem isHeawoodEdge_irrefl (i : Fin 14) :
+    isHeawoodEdge i i ≠ true := by
+  revert i; native_decide
+
 /-- The Heawood graph: 3-regular on 14 vertices, 21 edges, girth 6. -/
 def heawoodGraph : SimpleGraph (Fin 14) where
   Adj i j  := isHeawoodEdge i j = true
-  symm     := by native_decide
-  loopless := by native_decide
+  symm     := isHeawoodEdge_symm
+  loopless := isHeawoodEdge_irrefl
 
 instance : DecidableRel heawoodGraph.Adj :=
   fun i j => Bool.decEq (isHeawoodEdge i j) true
