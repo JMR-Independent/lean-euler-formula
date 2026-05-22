@@ -53,13 +53,13 @@ theorem k4          : PlanarGraph 4 6 4 :=
   .addEdge 4 5 3 (.addEdge 4 4 2 (.addLeaf 3 3 2
     (.addEdge 3 2 1 (.addLeaf 2 1 1 (.addLeaf 1 0 1 .point)))))
 
-theorem cube        : PlanarGraph 8 12 6 :=
+theorem cube_witness : PlanarGraph 8 12 6 :=
   .addEdge 8 11 5 (.addEdge 8 10 4 (.addEdge 8 9 3 (.addEdge 8 8 2
     (.addEdge 8 7 1 (.addLeaf 7 6 1 (.addLeaf 6 5 1 (.addLeaf 5 4 1
       (.addLeaf 4 3 1 (.addLeaf 3 2 1 (.addLeaf 2 1 1
         (.addLeaf 1 0 1 .point)))))))))))
 
-theorem octahedron  : PlanarGraph 6 12 8 :=
+theorem octahedron_witness : PlanarGraph 6 12 8 :=
   .addEdge 6 11 7 (.addEdge 6 10 6 (.addEdge 6 9 5 (.addEdge 6 8 4
     (.addEdge 6 7 3 (.addEdge 6 6 2 (.addEdge 6 5 1 (.addLeaf 5 4 1
       (.addLeaf 4 3 1 (.addLeaf 3 2 1 (.addLeaf 2 1 1
@@ -495,7 +495,7 @@ with those counts — not the actual dodecahedron (which has 12 pentagonal
 faces). The specific combinatorial structure of the dodecahedron is verified
 separately in `CMapEuler.lean` via `native_decide`.
 -/
-theorem dodecahedron_planar : PlanarGraph 20 30 12 := by
+theorem dodecahedron_planar_witness : PlanarGraph 20 30 12 := by
   -- Build inductively: start from point, add 19 leaves (V=20, E=19, F=1),
   -- then 11 addEdge operations to get to E=30, F=12.
   have h1 : PlanarGraph 20 19 1 := path_planar 20 (by omega)
@@ -517,9 +517,9 @@ These are the parameters of the icosahedron (Euler: 12 + 20 = 30 + 2 ✓).
 
 Note: this construction (path + addEdge) produces *some* valid planar graph
 with those counts — not the actual icosahedron (which has 20 triangular
-faces). See `dodecahedron_planar` for the same caveat.
+faces). See `dodecahedron_planar_witness` for the same caveat.
 -/
-theorem icosahedron_planar : PlanarGraph 12 30 20 := by
+theorem icosahedron_planar_witness : PlanarGraph 12 30 20 := by
   -- Build: path (V=12, E=11, F=1) + 19 addEdge ops → (V=12, E=30, F=20)
   have h1 : PlanarGraph 12 11 1 := path_planar 12 (by omega)
   have h := wheel_aux 12 11 1 h1 19
@@ -554,8 +554,8 @@ theorem platonic_euler_derived :
     (6 + 8 = 12 + 2 ∧ PlanarGraph 6 12 8) ∧
     (20 + 12 = 30 + 2 ∧ PlanarGraph 20 30 12) ∧
     (12 + 20 = 30 + 2 ∧ PlanarGraph 12 30 20) :=
-  ⟨⟨rfl, k4⟩, ⟨rfl, cube⟩, ⟨rfl, octahedron⟩,
-   ⟨rfl, dodecahedron_planar⟩, ⟨rfl, icosahedron_planar⟩⟩
+  ⟨⟨rfl, k4⟩, ⟨rfl, cube_witness⟩, ⟨rfl, octahedron_witness⟩,
+   ⟨rfl, dodecahedron_planar_witness⟩, ⟨rfl, icosahedron_planar_witness⟩⟩
 
 -- ============================================================
 -- PLATONIC CLASSIFICATION (the 5 solids are uniquely determined)
