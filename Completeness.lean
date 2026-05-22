@@ -134,7 +134,12 @@ theorem edge_count_eq :
 -- For a connected CMap, V + F = |D|/2 + 2.
 -- Proof: induction on |D| using contraction-deletion.
 
-/-- Connected combinatorial map: ⟨vertexPerm, edgePerm⟩ acts transitively -/
+/-- Connected combinatorial map: any dart is reachable from any other by
+alternating applications of `edgePerm` and `vertexPerm`.
+
+This is an operational encoding of transitivity of the group action of
+⟨edgePerm, vertexPerm⟩ on D. It is not yet proved equivalent to
+`SimpleGraph.Connected` or any other Mathlib connectivity notion. -/
 def IsConnected : Prop :=
   ∀ d₁ d₂ : D, ∃ (moves : List Bool),
     moves.foldl (fun d b => if b then M.edgePerm d else M.vertexPerm d) d₁ = d₂
