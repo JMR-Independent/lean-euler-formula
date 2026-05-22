@@ -167,6 +167,58 @@ example : PlanarGraph 1 0 1 := path_planar 1 (by omega)
 example : PlanarGraph 5 4 1 := path_planar 5 (by omega)
 example : PlanarGraph 10 9 1 := path_planar 10 (by omega)
 
+-- ============================================================
+-- CYCLES: V = E, F = 2
+-- ============================================================
+-- A cycle C_n is a planar graph with n vertices, n edges, 2 faces
+-- (interior + exterior). Built as path + closing edge.
+
+/-- Construct a cycle C_n with n vertices, n edges, 2 faces (n ≥ 3). -/
+theorem cycle_planar (n : ℕ) (hn : 3 ≤ n) : PlanarGraph n n 2 := by
+  have hpath : PlanarGraph n (n - 1) 1 := path_planar n (by omega)
+  have h := PlanarGraph.addEdge n (n - 1) 1 hpath
+  have : n - 1 + 1 = n := by omega
+  rw [this] at h
+  exact h
+
+-- Cycle examples
+example : PlanarGraph 3 3 2 := cycle_planar 3 (by omega)
+example : PlanarGraph 4 4 2 := cycle_planar 4 (by omega)
+example : PlanarGraph 100 100 2 := cycle_planar 100 (by omega)
+
+-- ============================================================
+-- WHEEL GRAPHS: W_n
+-- ============================================================
+-- A wheel W_n has a central hub connected to n vertices arranged in a cycle.
+-- V = n + 1, E = 2n (n cycle edges + n spokes), F = n + 1 (n triangles + 1 outer)
+
+/-- Construct a wheel W_n: hub + cycle of n vertices + n spokes (n ≥ 3). -/
+theorem wheel_planar (n : ℕ) (hn : 3 ≤ n) : PlanarGraph (n + 1) (2 * n) (n + 1) := by
+  -- Start from cycle: PlanarGraph n n 2
+  have hcycle : PlanarGraph n n 2 := cycle_planar n hn
+  -- Add the hub as a leaf attached to one cycle vertex: V=n+1, E=n+1, F=2
+  have h1 : PlanarGraph (n + 1) (n + 1) 2 :=
+    PlanarGraph.addLeaf n n 2 hcycle
+  -- Add (n - 1) spoke edges, each splitting a face: V unchanged, E += n-1, F += n-1
+  -- Final: V = n+1, E = (n+1) + (n-1) = 2n, F = 2 + (n-1) = n+1
+  have h2 := wheel_planar_aux (n + 1) (n + 1) 2 h1 (n - 1)
+  have he : n + 1 + (n - 1) = 2 * n := by omega
+  have hf : 2 + (n - 1) = n + 1 := by omega
+  rw [he, hf] at h2
+  exact h2
+where
+  /-- Helper: add k edges (each splits a face). -/
+  wheel_planar_aux (v e f : ℕ) (h : PlanarGraph v e f) (k : ℕ) :
+      PlanarGraph v (e + k) (f + k) := by
+    induction k with
+    | zero => exact h
+    | succ k ih => exact .addEdge v (e + k) (f + k) ih
+
+-- Wheel examples
+example : PlanarGraph 4 6 4 := wheel_planar 3 (by omega)   -- W_3 = K_4
+example : PlanarGraph 5 8 5 := wheel_planar 4 (by omega)   -- W_4
+example : PlanarGraph 6 10 6 := wheel_planar 5 (by omega)  -- W_5
+
 end PlanarGraph
 
 -- ============================================================
