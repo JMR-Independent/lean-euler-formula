@@ -646,6 +646,35 @@ theorem platonic_classification (p q V E F : ℕ)
     (platonic_constraint p q V E F hp hq hfaces hverts hpos_E hplanar)
 
 -- ============================================================
+-- K₅ AND K₃,₃ NON-PLANARITY VIA EDGE BOUNDS
+-- ============================================================
+-- Standard graph-theory consequence: any planar graph with V ≥ 3 and
+-- minimum face-degree ≥ 3 satisfies E ≤ 3V - 6. K₅ has V=5, E=10,
+-- and 10 > 3·5 - 6 = 9. Contradiction.
+
+/--
+**Cleaner K₅ non-planarity** via the face-degree bound:
+any planar graph on 5 vertices with simple structure (faces ≥ 3 edges)
+has at most 9 edges. K₅ has 10 edges. Hence K₅ is not planar.
+-/
+theorem k5_non_planar_via_face_bound
+    (h_planar : ∃ f, PlanarGraph 5 10 f ∧ 3 * f ≤ 2 * 10) : False := by
+  obtain ⟨f, hpg, hf⟩ := h_planar
+  have := euler_formula hpg
+  omega
+
+/--
+**Cleaner K₃,₃ non-planarity** via the bipartite face-degree bound:
+bipartite planar graphs with V ≥ 3 satisfy E ≤ 2V - 4.
+K₃,₃ has V=6, E=9, and 9 > 2·6 - 4 = 8.
+-/
+theorem k33_non_planar_via_bipartite_bound
+    (h_planar : ∃ f, PlanarGraph 6 9 f ∧ 4 * f ≤ 2 * 9) : False := by
+  obtain ⟨f, hpg, hf⟩ := h_planar
+  have := euler_formula hpg
+  omega
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
