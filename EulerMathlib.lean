@@ -595,6 +595,32 @@ theorem platonic_constraint (p q V E F : ℕ)
   -- E ≥ 1 and the equation E(2p+2q-pq) = 2pq forces 2p+2q-pq > 0
   nlinarith [hpos_E, Nat.zero_le p, Nat.zero_le q]
 
+/--
+**The 5 Platonic pairs (p, q)**: the only solutions to 2p + 2q > pq
+with p, q ≥ 3 are exactly the 5 Platonic configurations.
+
+For p, q ≥ 6: 2p + 2q ≤ pq (so excluded).
+For p, q ≥ 3, exhaustive check leaves only (3,3), (3,4), (4,3), (3,5), (5,3).
+-/
+theorem platonic_pairs_classification (p q : ℕ)
+    (hp : 3 ≤ p) (hq : 3 ≤ q) (h : 2 * p + 2 * q > p * q) :
+    (p = 3 ∧ q = 3) ∨ (p = 3 ∧ q = 4) ∨ (p = 4 ∧ q = 3) ∨
+    (p = 3 ∧ q = 5) ∨ (p = 5 ∧ q = 3) := by
+  -- Bound p and q: if p ≥ 6 and q ≥ 3, then pq ≥ 18 but 2p+2q ≤ 2p+2p = 4p ≤ pq/1.5
+  -- Cleaner: if p ≥ 6, then 2p+2q ≤ pq iff 2q ≤ p(q-2). With q ≥ 3: p(q-2) ≥ p ≥ 6 ≥ 2q only if q ≤ 3.
+  -- Direct interval check via omega after bounding both p, q ≤ 5.
+  have hp_le : p ≤ 5 := by
+    by_contra hp6
+    push_neg at hp6
+    -- p ≥ 6 → p * q ≥ 6 * q ≥ 6 * 3 = 18, while 2p + 2q ≤ 2p + 2p (if q ≤ p)...
+    -- Simpler: rewrite the bound. p*q ≥ 6q ≥ 2q + 4q ≥ 2q + 12 > 2q + 2p iff p < 6, contradiction.
+    nlinarith
+  have hq_le : q ≤ 5 := by
+    by_contra hq6
+    push_neg at hq6
+    nlinarith
+  interval_cases p <;> interval_cases q <;> omega
+
 -- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
