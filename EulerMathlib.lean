@@ -264,6 +264,46 @@ theorem pyramid_planar (n : ℕ) (hn : 3 ≤ n) :
     PlanarGraph (n + 1) (2 * n) (n + 1) :=
   wheel_planar n hn
 
+-- ============================================================
+-- STRUCTURAL PROPERTIES
+-- ============================================================
+
+/-- Any `PlanarGraph` has at least one vertex. -/
+theorem vertex_pos {v e f : ℕ} (h : PlanarGraph v e f) : 1 ≤ v := by
+  induction h with
+  | point => omega
+  | addLeaf _ _ _ _ ih => omega
+  | addEdge _ _ _ _ ih => omega
+
+/-- Any `PlanarGraph` has at least one face (the outer face). -/
+theorem face_pos {v e f : ℕ} (h : PlanarGraph v e f) : 1 ≤ f := by
+  induction h with
+  | point => omega
+  | addLeaf _ _ _ _ ih => omega
+  | addEdge _ _ _ _ ih => omega
+
+/-- Any `PlanarGraph` satisfies E ≤ V + F - 2. -/
+theorem edge_le_vertex_plus_face {v e f : ℕ} (h : PlanarGraph v e f) :
+    e ≤ v + f - 2 := by
+  have := euler_formula h
+  have := vertex_pos h
+  have := face_pos h
+  omega
+
+/-- A `PlanarGraph` with no edges is a single vertex. -/
+theorem no_edges_iff_point {v f : ℕ} (h : PlanarGraph v 0 f) :
+    v = 1 ∧ f = 1 := by
+  have := euler_formula h
+  have := vertex_pos h
+  have := face_pos h
+  omega
+
+/-- A `PlanarGraph` with exactly one face (no cycles) has E = V - 1. -/
+theorem one_face_iff_tree {v e : ℕ} (h : PlanarGraph v e 1) :
+    e + 1 = v := by
+  have := euler_formula h
+  omega
+
 end PlanarGraph
 
 -- ============================================================
