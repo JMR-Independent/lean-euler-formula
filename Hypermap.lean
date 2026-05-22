@@ -343,12 +343,58 @@ def DufourdWalkupParameter (M : CombinatorialMap (Fin (n+1))) : Type :=
 
 theorem dufourdWalkupParameter_exists (M : CombinatorialMap (Fin (n+1))) :
     Nonempty (M.DufourdWalkupParameter) := by
-  -- Since edgePerm has no fixed points by axiom, any dart works.
   refine ⟨⟨0, ?_⟩⟩
   intro h
   exact M.isEmpty_fixedPoints_edgePerm.false ⟨0, h⟩
 
 end CombinatorialMap
+
+/-! ## Block 12: Concrete instances satisfy vanStaudt_arith partition
+
+For each concrete CMap, verify the Van Staudt partition hypothesis
+(V-1) + (F-1) = E. Combined with `vanStaudt_arith`, this gives a
+Jordan-free derivation of Euler for each one.
+-/
+
+theorem singleEdgeMap_vanStaudt :
+    (Fintype.card singleEdgeMap.Vertex - 1) +
+    (Fintype.card singleEdgeMap.Face - 1) =
+    Fintype.card singleEdgeMap.Edge := by
+  native_decide
+
+theorem triangleMap_vanStaudt :
+    (Fintype.card triangleMap.Vertex - 1) +
+    (Fintype.card triangleMap.Face - 1) =
+    Fintype.card triangleMap.Edge := by
+  native_decide
+
+theorem k4Map_vanStaudt :
+    (Fintype.card k4Map.Vertex - 1) +
+    (Fintype.card k4Map.Face - 1) =
+    Fintype.card k4Map.Edge := by
+  native_decide
+
+theorem cubeMap_vanStaudt :
+    (Fintype.card cubeMap.Vertex - 1) +
+    (Fintype.card cubeMap.Face - 1) =
+    Fintype.card cubeMap.Edge := by
+  native_decide
+
+theorem octahedronMap_vanStaudt :
+    (Fintype.card octahedronMap.Vertex - 1) +
+    (Fintype.card octahedronMap.Face - 1) =
+    Fintype.card octahedronMap.Edge := by
+  native_decide
+
+/-- The torus map FAILS the Van Staudt partition: it has no valid
+spanning tree decomposition because it's not planar. -/
+theorem torusCMap_fails_vanStaudt :
+    (Fintype.card torusCMap.Vertex - 1) +
+    (Fintype.card torusCMap.Face - 1) ≠
+    Fintype.card torusCMap.Edge := by
+  native_decide
+
+
 
 /-! ## Status
 
