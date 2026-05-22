@@ -849,6 +849,52 @@ theorem regular_triangulation_enumeration (v q : ℕ)
   interval_cases q <;> omega
 
 -- ============================================================
+-- DUAL: REGULAR NON-TRIANGULAR POLYHEDRA (p ≥ 4)
+-- ============================================================
+-- For pF = 2E with p ≥ 4 and qV = 2E with q = 3 (cubic vertices):
+--   The 3-cubic graph case has at most 2 solutions:
+--   p=3 → tetrahedron (already covered above)
+--   p=4 → cube (V=8, E=12, F=6)
+--   p=5 → dodecahedron (V=20, E=30, F=12)
+--   p=6 → would give 0/0 (infinite/flat) — degenerate
+
+/--
+**3-regular polyhedron constraint**: a planar polyhedron where every
+vertex has degree exactly 3 and every face has exactly p edges satisfies
+3V = 2E = pF and V + F = E + 2, forcing 6V = (p+2)·V/?... Cleanly:
+  3V = 2E ⟹ V = 2E/3
+  pF = 2E ⟹ F = 2E/p
+  Euler: 2E/3 + 2E/p = E + 2 ⟹ E(2/3 + 2/p - 1) = 2 ⟹ E(2p + 6 - 3p) = 6p
+  ⟹ E(6 - p) = 6p, so p < 6.
+-/
+theorem regular_cubic_constraint (v e f p : ℕ)
+    (hv : 4 ≤ v) (hp : 3 ≤ p)
+    (h : PlanarGraph v e f)
+    (hface : p * f = 2 * e)
+    (hvert : 3 * v = 2 * e) :
+    e * 6 = e * p + 6 * p ∧ p < 6 := by
+  have hE := euler_formula h
+  refine ⟨?_, ?_⟩
+  · -- Euler: v+f = e+2. From 3v=2e: v = 2e/3 (only when e is mult of 3 we use 3v=2e).
+    -- Combine: 2e/3 + f = e + 2 ⟹ multiply by 3: 2e + 3f = 3e + 6.
+    -- With pf = 2e: 3f = 6e/p (when p | 6e), but use integer form:
+    -- 3·(2e) = 3·(pf) so 6e = 3pf, and 2e+3f = 3e+6 ⟹ 3f = e+6.
+    -- Then 3pf = (e+6)p, 6e = (e+6)p, so 6e = ep + 6p ✓.
+    nlinarith [hE, hface, hvert, hv, hp]
+  · by_contra hp6
+    push_neg at hp6
+    -- p ≥ 6 ⟹ ep + 6p ≥ 6e + 6p > 6e, contradicting 6e = ep + 6p
+    nlinarith [hE, hface, hvert, hv, hp6]
+
+/-- The 3-regular planar polyhedra: tetrahedron (p=3), cube (p=4),
+dodecahedron (p=5). -/
+theorem regular_cubic_enumeration (e p : ℕ)
+    (he : 6 ≤ e) (hp : 3 ≤ p) (hp6 : p < 6)
+    (heq : e * 6 = e * p + 6 * p) :
+    (p = 3 ∧ e = 6) ∨ (p = 4 ∧ e = 12) ∨ (p = 5 ∧ e = 30) := by
+  interval_cases p <;> omega
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
