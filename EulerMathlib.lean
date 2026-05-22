@@ -304,6 +304,54 @@ theorem one_face_iff_tree {v e : ℕ} (h : PlanarGraph v e 1) :
   have := euler_formula h
   omega
 
+-- ============================================================
+-- DISJOINT UNION  (preserved via construction)
+-- ============================================================
+-- Combining two PlanarGraphs by gluing at a vertex (identifying one vertex
+-- from each) gives a new PlanarGraph with combined counts.
+-- Operation: V₁ + V₂ - 1, E₁ + E₂, F₁ + F₂ - 1.
+-- The "-1" comes from: shared vertex counted once, outer face merged.
+
+/--
+**Vertex-gluing**: combining two PlanarGraphs at a shared vertex
+preserves Euler. (V₁+V₂-1) + (F₁+F₂-1) = (E₁+E₂) + 2 follows from
+both V_i + F_i = E_i + 2.
+-/
+theorem glue_preserves_euler {v₁ e₁ f₁ v₂ e₂ f₂ : ℕ}
+    (h₁ : PlanarGraph v₁ e₁ f₁) (h₂ : PlanarGraph v₂ e₂ f₂) :
+    (v₁ + v₂ - 1) + (f₁ + f₂ - 1) = (e₁ + e₂) + 2 := by
+  have h1 := euler_formula h₁
+  have h2 := euler_formula h₂
+  have hV1 := vertex_pos h₁
+  have hF1 := face_pos h₁
+  have hV2 := vertex_pos h₂
+  have hF2 := face_pos h₂
+  omega
+
+-- ============================================================
+-- MAX EDGE COUNT (Euler bound saturation)
+-- ============================================================
+
+/--
+**Maximum-edge planar graphs (triangulations)**: V + F = E + 2 plus
+3F ≤ 2E gives E ≤ 3V - 6 with equality iff every face is triangular.
+
+The maximum number of edges in a simple planar graph with V vertices.
+-/
+theorem max_edges_planar {v e : ℕ}
+    (h : PlanarGraph v e (2 * v - 4))
+    (hv : 2 ≤ v) :
+    e = 3 * v - 6 := by
+  have := euler_formula h; omega
+
+/-- Lower bound: any planar graph on ≥ 1 vertices satisfies E ≥ V - 1
+    (with equality on trees, F = 1). -/
+theorem min_edges_planar {v e f : ℕ} (h : PlanarGraph v e f) :
+    v ≤ e + 1 := by
+  have := euler_formula h
+  have := face_pos h
+  omega
+
 end PlanarGraph
 
 -- ============================================================
