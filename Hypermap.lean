@@ -318,6 +318,36 @@ theorem walkupAt_composition
   rw [walkupAt_of_fixed f r₁ r₂ hf (e (v d))]
   exact hcomp d
 
+/-! ## Block 11: degeneracy — walkup at already-fixed pair is identity
+
+The honest characterization of what Block 10 says:
+when all three permutations already fix the pair, walking up does nothing.
+The map is unchanged. This is consistent because in a true CMap,
+edgePerm has NO fixed points — so no dart of edgePerm is "already fixed".
+
+Therefore: the framework of MapsFixedPair-style walkup is too weak to
+reduce a real CombinatorialMap. We need a different approach:
+ACTUAL walkup that changes edgePerm via collapseEdge, NOT one that
+requires fixing to already hold.
+
+This is documented honestly: Block 10's composition theorem holds
+trivially because nothing changed. For the REAL Dufourd-style walkup,
+we need to define collapseEdge for σ and φ in a way that depends on
+the edge r ↔ edgePerm r structure, not on σ already fixing them.
+-/
+
+/-- Walkup at a non-trivial dart: defined ONLY when the chosen r is NOT
+a fixed point of M.edgePerm. This is the Dufourd Walkup. -/
+def DufourdWalkupParameter (M : CombinatorialMap (Fin (n+1))) : Type :=
+  { r : Fin (n+1) // M.edgePerm r ≠ r }
+
+theorem dufourdWalkupParameter_exists (M : CombinatorialMap (Fin (n+1))) :
+    Nonempty (M.DufourdWalkupParameter) := by
+  -- Since edgePerm has no fixed points by axiom, any dart works.
+  refine ⟨⟨0, ?_⟩⟩
+  intro h
+  exact M.isEmpty_fixedPoints_edgePerm.false ⟨0, h⟩
+
 end CombinatorialMap
 
 /-! ## Status
