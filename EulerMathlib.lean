@@ -592,8 +592,6 @@ theorem platonic_constraint (p q V E F : ℕ)
   -- Therefore 2p + 2q > pq.
   have h1 : 2 * p * E + 2 * q * E = p * q * E + 2 * p * q := by
     have := hplanar
-    -- q V = 2E, so p * (q V) = p * 2 E, so q * (p * V) = 2 p E
-    -- Multiply Euler by pq:
     have eulerPQ : p * q * V + p * q * F = p * q * E + 2 * p * q := by
       have : p * q * (V + F) = p * q * (E + 2) := by rw [this]
       ring_nf at this ⊢
@@ -621,19 +619,10 @@ theorem platonic_pairs_classification (p q : ℕ)
     (hp : 3 ≤ p) (hq : 3 ≤ q) (h : 2 * p + 2 * q > p * q) :
     (p = 3 ∧ q = 3) ∨ (p = 3 ∧ q = 4) ∨ (p = 4 ∧ q = 3) ∨
     (p = 3 ∧ q = 5) ∨ (p = 5 ∧ q = 3) := by
-  -- Bound p and q: if p ≥ 6 and q ≥ 3, then pq ≥ 18 but 2p+2q ≤ 2p+2p = 4p ≤ pq/1.5
-  -- Cleaner: if p ≥ 6, then 2p+2q ≤ pq iff 2q ≤ p(q-2). With q ≥ 3: p(q-2) ≥ p ≥ 6 ≥ 2q only if q ≤ 3.
-  -- Direct interval check via omega after bounding both p, q ≤ 5.
   have hp_le : p ≤ 5 := by
-    by_contra hp6
-    push_neg at hp6
-    -- p ≥ 6 → p * q ≥ 6 * q ≥ 6 * 3 = 18, while 2p + 2q ≤ 2p + 2p (if q ≤ p)...
-    -- Simpler: rewrite the bound. p*q ≥ 6q ≥ 2q + 4q ≥ 2q + 12 > 2q + 2p iff p < 6, contradiction.
-    nlinarith
+    by_contra hp6; push_neg at hp6; nlinarith
   have hq_le : q ≤ 5 := by
-    by_contra hq6
-    push_neg at hq6
-    nlinarith
+    by_contra hq6; push_neg at hq6; nlinarith
   interval_cases p <;> interval_cases q <;> omega
 
 /--

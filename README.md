@@ -10,8 +10,8 @@ No `sorry`. CI on every commit.
 
 | Result | Description |
 |---|---|
-| `euler_formula` | V + F = E + 2 for any `PlanarGraph` |
-| `platonic_classification` | The five Platonic solids (Wiedijk #38) |
+| `euler_formula` | V + F = E + 2 for any `PlanarGraph` (Wiedijk #13) |
+| `platonic_classification` | The five Platonic solids (Wiedijk #50) |
 | `petersen_not_planar`, `heawood_not_planar` | Non-planarity via girth bounds (girth hypothesis is assumed, not proved) |
 | `girth_planarity_bound` | Edge bound from girth; implies K₅ and K₃,₃ cases |
 | `edge_count_eq` | \|E\| = \|D\|/2 for any fixed-point-free involution |
