@@ -220,6 +220,47 @@ noncomputable def collapseEdgePerm (π : Equiv.Perm (Fin (n+1)))
     Equiv.Perm (Fin (n+1)) :=
   Equiv.ofBijective (collapseEdge π r) (collapseEdge_bijective π hinv r)
 
+/-- Coercion: collapseEdgePerm acts like collapseEdge. -/
+@[simp] theorem collapseEdgePerm_apply (π : Equiv.Perm (Fin (n+1)))
+    (hinv : Function.Involutive π) (r d : Fin (n+1)) :
+    collapseEdgePerm π hinv r d = collapseEdge π r d := rfl
+
+/-! ## Block 8: Walkup — making both r and (edge r) fixed everywhere
+
+The Walkup operation produces a new CombinatorialMap on Fin (n+1)
+where the dart pair {r, edge r} becomes "isolated":
+  - new edgePerm = collapseEdge of old edgePerm
+  - new vertexPerm = also collapses the same {r, edge r} to fixed points
+  - new facePerm = same
+
+This requires the new permutations to satisfy:
+  new_face * new_edge * new_vertex = 1
+
+We approach it via a SIMPLIFIED definition: the Walkup just turns
+{r, edge r} into fixed points in all three perms. The group relation
+needs to be re-verified.
+-/
+
+/-- Walkup permutation: collapseEdge using the SAME edge `r, edgePerm r`
+but applied to an arbitrary permutation `π`. We collapse w.r.t. the
+edge defined by M.edgePerm at dart r. -/
+def walkupAt (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ : Fin (n+1)) :
+    Fin (n+1) → Fin (n+1) :=
+  fun d => if d = r₁ ∨ d = r₂ then d else π d
+
+theorem walkupAt_fixes_r₁ (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ : Fin (n+1)) :
+    walkupAt π r₁ r₂ r₁ = r₁ := by
+  unfold walkupAt; simp
+
+theorem walkupAt_fixes_r₂ (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ : Fin (n+1)) :
+    walkupAt π r₁ r₂ r₂ = r₂ := by
+  unfold walkupAt; simp
+
+theorem walkupAt_eq_orig (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ d : Fin (n+1))
+    (h₁ : d ≠ r₁) (h₂ : d ≠ r₂) :
+    walkupAt π r₁ r₂ d = π d := by
+  unfold walkupAt; simp [h₁, h₂]
+
 end CombinatorialMap
 
 /-! ## Status
