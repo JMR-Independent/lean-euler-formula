@@ -28,3 +28,6 @@ name = "IsPlanarIffIsSpherical"
 
 [[lean_lib]]
 name = "GeometricEmbedding"
+
+[[lean_lib]]
+name = "CycleDoubleCover"
