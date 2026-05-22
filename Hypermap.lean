@@ -87,6 +87,24 @@ theorem skipPerm_involutive_aux (π : Equiv.Perm (Fin (n+1)))
   rw [skipPerm_eq_orig π r (π d) h2]
   exact hinv d
 
+/-- If `r` is a fixed point of `π` (i.e. `π r = r`), then `skipPerm π r = π`. -/
+theorem skipPerm_of_fixed (π : Equiv.Perm (Fin (n+1)))
+    (r : Fin (n+1)) (hr : π r = r) (d : Fin (n+1)) :
+    skipPerm π r d = π d := by
+  unfold skipPerm
+  by_cases h : π d = r
+  · -- π d = r and π r = r, so π d = π r, hence d = r (π injective), so π d = π r = r
+    have hd : d = r := π.injective (h.trans hr.symm)
+    rw [hd, h]
+    exact hr.symm
+  · simp [h]
+
+/-- Trivially, skipPerm is the identity at the fixed dart whenever π r = r. -/
+theorem skipPerm_fixed_at_r (π : Equiv.Perm (Fin (n+1)))
+    (r : Fin (n+1)) (hr : π r = r) :
+    skipPerm π r r = r := by
+  rw [skipPerm_of_fixed π r hr, hr]
+
 end CombinatorialMap
 
 /-! ## Status
