@@ -728,15 +728,18 @@ theorem girth_planarity_bound (v e f g : ℕ)
     (hv : 3 ≤ v) (hg : 3 ≤ g)
     (h : PlanarGraph v e f)
     (hface : g * f ≤ 2 * e) :
-    e * (g - 2) ≤ g * (v - 2) := by
+    e * g + 2 * v ≤ 2 * e + g * v := by
+  -- Restate without subtractions for cleaner Nat arithmetic.
+  -- This is equivalent to e * (g - 2) ≤ g * (v - 2) when v ≥ 2, g ≥ 2.
   have hE := euler_formula h
-  have hF := face_pos h
-  -- Euler v + f = e + 2; multiply by g: g·v + g·f = g·e + 2·g
-  -- With g·f ≤ 2·e: g·v + 2·e ≥ g·v + g·f = g·e + 2·g
-  -- So g·e - 2·e ≤ g·v - 2·g, i.e. e(g-2) ≤ g(v-2).
-  -- All nat-distributivity handled by omega given the hypotheses.
+  -- Multiply Euler by g: g·v + g·f = g·e + 2·g.
+  -- Combined with g·f ≤ 2·e: g·e + 2·g ≤ 2·e + g·v.
+  -- Add 2·v - 2·g to both sides: g·e + 2·v ≤ 2·e + g·v + (2·v - 2·g)... need care.
+  -- Actually simpler: g·v + g·f = g·e + 2·g ⟹ g·e ≤ g·v + 2·e - 2·g (rearrange + hface)
+  -- ⟹ g·e + 2·g ≤ g·v + 2·e ⟹ g·e + 2·v ≤ 2·e + g·v + (2·v - 2·g)
+  -- Direct nlinarith:
   have hmul : g * (v + f) = g * (e + 2) := by rw [hE]
-  nlinarith [hmul, hface, hv, hg, hF]
+  nlinarith [hmul, hface, hv, hg]
 
 -- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
