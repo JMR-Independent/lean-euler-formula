@@ -320,20 +320,11 @@ theorem walkupAt_composition
 
 /-! ## Block 11: degeneracy — walkup at already-fixed pair is identity
 
-The honest characterization of what Block 10 says:
-when all three permutations already fix the pair, walking up does nothing.
-The map is unchanged. This is consistent because in a true CMap,
-edgePerm has NO fixed points — so no dart of edgePerm is "already fixed".
-
-Therefore: the framework of MapsFixedPair-style walkup is too weak to
-reduce a real CombinatorialMap. We need a different approach:
-ACTUAL walkup that changes edgePerm via collapseEdge, NOT one that
-requires fixing to already hold.
-
-This is documented honestly: Block 10's composition theorem holds
-trivially because nothing changed. For the REAL Dufourd-style walkup,
-we need to define collapseEdge for σ and φ in a way that depends on
-the edge r ↔ edgePerm r structure, not on σ already fixing them.
+When all three permutations already fix the pair, walking up does nothing.
+Note: in a valid CMap, edgePerm has no fixed points, so this block
+applies only to the auxiliary `walkupAt` construction — not to real CMap
+darts. The Dufourd-style walkup (Block 9+) handles the non-trivial case
+via `collapseEdge`.
 -/
 
 /-- Walkup at a non-trivial dart: defined ONLY when the chosen r is NOT
@@ -555,19 +546,10 @@ end TriangleWalkupTest
 
 /-! ## Status
 
-Block 1: ✓ skipPerm + WalkupData
-Block 2: ✓ skipPerm properties
-Block 3: ✓ skipPerm at fixed points
-Block 4: ✓ image bounds + safe involutivity
-Block 5: ✓ collapseEdge: makes r and (edge r) fixed points
+Completed: `skipPerm`, `WalkupData`, image bounds, safe involutivity,
+and `collapseEdge` (makes r and edgePerm r fixed points).
 
-This is the FOUNDATION for the real Walkup: collapseEdge applied to all
-three permutations gives a "smaller in spirit" CMap (two isolated darts
-that don't affect orbit counts of the rest).
-
-The induction will then proceed: keep applying collapseEdge until all
-darts are isolated, count what we did, derive Euler.
-
-Remaining: proving collapseEdge is involutive when restricted properly,
-preserving the group relation, and counting orbit changes.
+Remaining: proving `collapseEdge` preserves the group relation and
+counting orbit changes under repeated collapse — the inductive step
+needed to derive Euler for arbitrary CMaps.
 -/
