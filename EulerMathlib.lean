@@ -450,8 +450,8 @@ example : PlanarGraph 10 20 12 := antiprism_planar 5 (by omega)
 -- ============================================================
 -- DW_n: V = n + 2 (n rim + 2 hubs), E = 3n (n rim + 2n spokes),
 --      F = 2n + 1 (2n triangular faces from spokes + 1 outer cycle face)
--- Wait, need to recount: with 2 hubs and n-cycle, F = 2n (n above + n below)
--- Then V + F = E + 2: (n+2) + 2n = 3n + 2 ✓
+
+
 
 /-- Double wheel DW_n: V = n+2, E = 3n, F = 2n. -/
 theorem doubleWheel_planar (n : ℕ) (hn : 3 ≤ n) :
@@ -900,12 +900,7 @@ theorem regular_cubic_constraint (v e f p : ℕ)
     e * 6 = e * p + 6 * p ∧ p < 6 := by
   have hE := euler_formula h
   refine ⟨?_, ?_⟩
-  · -- Euler: v+f = e+2. From 3v=2e: v = 2e/3 (only when e is mult of 3 we use 3v=2e).
-    -- Combine: 2e/3 + f = e + 2 ⟹ multiply by 3: 2e + 3f = 3e + 6.
-    -- With pf = 2e: 3f = 6e/p (when p | 6e), but use integer form:
-    -- 3·(2e) = 3·(pf) so 6e = 3pf, and 2e+3f = 3e+6 ⟹ 3f = e+6.
-    -- Then 3pf = (e+6)p, 6e = (e+6)p, so 6e = ep + 6p ✓.
-    nlinarith [hE, hface, hvert, hv, hp]
+  · nlinarith [hE, hface, hvert, hv, hp]
   · by_contra hp6
     push_neg at hp6
     -- p ≥ 6 ⟹ ep + 6p ≥ 6e + 6p > 6e, contradicting 6e = ep + 6p
@@ -964,15 +959,9 @@ theorem cubic_planar_edge_count (v e : ℕ)
 /-- Ladder L_n: V = 2n, E = 3n - 2, F = n (for n ≥ 2). -/
 theorem ladder_planar (n : ℕ) (hn : 2 ≤ n) :
     PlanarGraph (2 * n) (3 * n - 2) n := by
-  -- Start from K_{2,2} = ladder L_2: V=4, E=4, F=2
-  -- Actually K_{2,2} corresponds to a 4-cycle, not a ladder.
-  -- Build inductively from L_2:
-  --   L_2: a 4-cycle (V=4, E=4, F=2) — but that's NOT the right shape.
-  -- Correct base: L_2 = single rung K_2 ⊔ second K_2 connected by 2 verticals
-  --              That's a 4-cycle: V=4, E=4, F=2.
-  --
-  -- Inductive step: L_{n+1} = L_n + 2 leaves (2 new vertices) + 1 closing edge
-  -- (V: 2n → 2n+2, E: 3n-2 → 3n+1 = 3(n+1)-2, F: n → n+1)
+  -- Base L_2: 4-cycle (V=4, E=4, F=2).
+  -- Inductive step: L_{n+1} = L_n + 2 leaves + 1 closing edge
+  -- (V: 2n → 2n+2, E: 3n-2 → 3(n+1)-2, F: n → n+1)
   induction n, hn using Nat.le_induction with
   | base =>
     -- L_2: 4-cycle. V=4, E=4, F=2. 3·2 - 2 = 4 ✓
