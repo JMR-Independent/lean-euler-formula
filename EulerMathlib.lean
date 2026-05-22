@@ -818,29 +818,33 @@ theorem triangulation_combined (v e f : ℕ)
 
 /--
 **Regular triangulation constraint**: if every face is triangular and
-every vertex has degree q ≥ 3, then q < 6 and V = 12/(6-q).
+every vertex has degree q ≥ 3, then q < 6 and 6V = qV + 12.
 The 3 solutions: q=3 (tetrahedron V=4), q=4 (octahedron V=6),
 q=5 (icosahedron V=12).
+
+Formulated without Nat subtraction for cleaner arithmetic.
 -/
 theorem regular_triangulation_constraint (v e f q : ℕ)
     (hv : 3 ≤ v) (hq : 3 ≤ q)
     (h : PlanarGraph v e f)
     (hface : 3 * f = 2 * e)
     (hvert : q * v = 2 * e) :
-    v * (6 - q) = 12 ∧ q < 6 := by
+    6 * v = q * v + 12 ∧ q < 6 := by
   have hE := euler_formula h
+  -- From Euler v + f = e + 2 and 3f = 2e: e = 3v - 6, f = 2v - 4.
+  -- From qv = 2e = 6v - 12: 6v = qv + 12.
   refine ⟨?_, ?_⟩
   · nlinarith [hE, hface, hvert, hv]
-  · -- If q ≥ 6 then qV ≥ 6V > 2E = 3F = 6V-12, contradiction.
+  · -- If q ≥ 6: qV ≥ 6V, but qV + 12 = 6V is impossible.
     by_contra h6
     push_neg at h6
-    nlinarith [hE, hface, hvert, hv]
+    nlinarith [hE, hface, hvert, hv, h6]
 
 /-- The three regular triangulations: V=4 (tetrahedron), V=6 (octahedron),
 V=12 (icosahedron). -/
-theorem regular_triangulation_enumeration (v : ℕ) (q : ℕ)
+theorem regular_triangulation_enumeration (v q : ℕ)
     (hv : 3 ≤ v) (hq : 3 ≤ q) (hq6 : q < 6)
-    (heq : v * (6 - q) = 12) :
+    (heq : 6 * v = q * v + 12) :
     (q = 3 ∧ v = 4) ∨ (q = 4 ∧ v = 6) ∨ (q = 5 ∧ v = 12) := by
   interval_cases q <;> omega
 
