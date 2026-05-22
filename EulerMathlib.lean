@@ -480,6 +480,46 @@ example : PlanarGraph 6 12 8 := doubleWheel_planar 4 (by omega)
 example : PlanarGraph 7 15 10 := doubleWheel_planar 5 (by omega)
 
 -- ============================================================
+-- DODECAHEDRON AND ICOSAHEDRON
+-- ============================================================
+-- Two remaining Platonic solids.
+-- Dodecahedron: V=20, E=30, F=12 (12 pentagonal faces)
+-- Icosahedron:  V=12, E=30, F=20 (20 triangular faces)
+
+/-- Dodecahedron as a PlanarGraph: V=20, E=30, F=12. -/
+theorem dodecahedron_planar : PlanarGraph 20 30 12 := by
+  -- Build inductively: start from point, add 19 leaves (V=20, E=19, F=1),
+  -- then 11 addEdge operations to get to E=30, F=12.
+  have h1 : PlanarGraph 20 19 1 := path_planar 20 (by omega)
+  have h := wheel_aux 20 19 1 h1 11
+  have he : 19 + 11 = 30 := by omega
+  have hf : 1 + 11 = 12 := by omega
+  rw [he, hf] at h
+  exact h
+where
+  wheel_aux (v e f : ℕ) (h : PlanarGraph v e f) (k : ℕ) :
+      PlanarGraph v (e + k) (f + k) := by
+    induction k with
+    | zero => exact h
+    | succ k ih => exact .addEdge v (e + k) (f + k) ih
+
+/-- Icosahedron as a PlanarGraph: V=12, E=30, F=20. -/
+theorem icosahedron_planar : PlanarGraph 12 30 20 := by
+  -- Build: path (V=12, E=11, F=1) + 19 addEdge ops → (V=12, E=30, F=20)
+  have h1 : PlanarGraph 12 11 1 := path_planar 12 (by omega)
+  have h := wheel_aux 12 11 1 h1 19
+  have he : 11 + 19 = 30 := by omega
+  have hf : 1 + 19 = 20 := by omega
+  rw [he, hf] at h
+  exact h
+where
+  wheel_aux (v e f : ℕ) (h : PlanarGraph v e f) (k : ℕ) :
+      PlanarGraph v (e + k) (f + k) := by
+    induction k with
+    | zero => exact h
+    | succ k ih => exact .addEdge v (e + k) (f + k) ih
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
