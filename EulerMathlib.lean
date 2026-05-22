@@ -847,7 +847,6 @@ every vertex has degree q ≥ 3, then q < 6 and 6V = qV + 12.
 The 3 solutions: q=3 (tetrahedron V=4), q=4 (octahedron V=6),
 q=5 (icosahedron V=12).
 
-Formulated without Nat subtraction for cleaner arithmetic.
 -/
 theorem regular_triangulation_constraint (v e f q : ℕ)
     (hv : 3 ≤ v) (hq : 3 ≤ q)
