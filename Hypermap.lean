@@ -55,15 +55,6 @@ structure WalkupData (M : CombinatorialMap (Fin (n+1))) (r : Fin (n+1)) where
   /-- The removed dart is a fixed point of all new permutations. -/
   fixedAtR  : newVertex r = r ∧ newEdge r = r ∧ newFace r = r
 
-/-- The skip permutation fixes the removed dart whenever the original π
-    has `r` and `π r` in a 2-cycle. -/
-theorem skipPerm_fixes_two_cycle (π : Equiv.Perm (Fin (n+1)))
-    (r : Fin (n+1)) (h : π (π r) = r) :
-    skipPerm π r r = r := by
-  unfold skipPerm
-  by_cases hpr : π r = r
-  · simp [hpr]
-  · simp [hpr]; exact h
 
 /-- If `d` is mapped by `π` to a non-removed dart, `skipPerm` agrees with `π`. -/
 theorem skipPerm_eq_orig (π : Equiv.Perm (Fin (n+1)))
