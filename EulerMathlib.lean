@@ -771,6 +771,44 @@ theorem planar_has_low_degree_vertex (v e f : ℕ)
   rw [hd]; exact planar_six_degree_bound v e f hv h hface
 
 -- ============================================================
+-- TRIANGULATION IDENTITIES
+-- ============================================================
+-- A maximal planar graph (triangulation): every face has exactly 3 edges.
+-- Then 3F = 2E exactly. Combined with V + F = E + 2:
+--   F = 2V - 4, E = 3V - 6.
+
+/--
+**Triangulation face count**: in a planar triangulation
+(every face exactly 3-sided, 3F = 2E), F = 2V - 4 when V ≥ 3.
+-/
+theorem triangulation_face_count (v e f : ℕ)
+    (hv : 3 ≤ v) (h : PlanarGraph v e f)
+    (hexact : 3 * f = 2 * e) :
+    f + 4 = 2 * v := by
+  have := euler_formula h
+  omega
+
+/--
+**Triangulation edge count**: E = 3V - 6 for triangulations.
+-/
+theorem triangulation_edge_count (v e f : ℕ)
+    (hv : 3 ≤ v) (h : PlanarGraph v e f)
+    (hexact : 3 * f = 2 * e) :
+    e + 6 = 3 * v := by
+  have := euler_formula h
+  omega
+
+/--
+**Combined identity**: for triangulations, E + F = 5V - 10.
+-/
+theorem triangulation_combined (v e f : ℕ)
+    (hv : 3 ≤ v) (h : PlanarGraph v e f)
+    (hexact : 3 * f = 2 * e) :
+    e + f + 10 = 5 * v := by
+  have := euler_formula h
+  omega
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
