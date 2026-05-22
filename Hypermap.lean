@@ -208,6 +208,18 @@ theorem collapseEdge_involutive (π : Equiv.Perm (Fin (n+1)))
   rw [collapseEdge_eq_orig π r (π d) hne1 hne2]
   exact hinv d
 
+/-- collapseEdge of an involution is bijective (since it's involutive). -/
+theorem collapseEdge_bijective (π : Equiv.Perm (Fin (n+1)))
+    (hinv : Function.Involutive π) (r : Fin (n+1)) :
+    Function.Bijective (collapseEdge π r) :=
+  Function.Involutive.bijective (collapseEdge_involutive π hinv r)
+
+/-- The collapseEdge as an Equiv.Perm (when applied to an involution). -/
+noncomputable def collapseEdgePerm (π : Equiv.Perm (Fin (n+1)))
+    (hinv : Function.Involutive π) (r : Fin (n+1)) :
+    Equiv.Perm (Fin (n+1)) :=
+  Equiv.ofBijective (collapseEdge π r) (collapseEdge_bijective π hinv r)
+
 end CombinatorialMap
 
 /-! ## Status
