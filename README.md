@@ -27,10 +27,10 @@ families, Platonic solid classification, non-planarity of K₅ and K₃,₃
 (formally via `SimpleGraph`), concrete CMap witnesses for triangle through
 octahedron, and a Jordan-free arithmetic derivation for explicit maps.
 
-The Petersen and Heawood non-planarity results are proved conditionally: they
-show that no planar graph can have those vertex/edge counts with minimum face
-size ≥5 or ≥6 respectively, but those graphs are not formally defined as
-`SimpleGraph` instances here. K₅ has the fully formal treatment as a model.
+Petersen and Heawood are now formally defined as `SimpleGraph (Fin n)` instances
+with machine-verified edge counts, following the same pattern as K₅. Their
+non-planarity uses a girth bound: any planar embedding would force a face-size
+inequality that contradicts Euler — the girth itself is not formally proved.
 
 What remains: constructing the spanning-tree partition algorithmically for
 arbitrary CMaps (currently verified by `native_decide` on concrete instances),

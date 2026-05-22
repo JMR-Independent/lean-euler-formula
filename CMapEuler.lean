@@ -10,8 +10,8 @@
   3. Proves eulerCharacteristic = 2 for any spherical CMap
   4. Verifies concrete maps (triangle, K₄) by computation
 
-  The key gap in PR #16074: IsPlanar is defined as eulerCharacteristic = 2
-  but no map is ever shown to satisfy it. This file fills that gap.
+  Concrete examples (triangle, K₄, cube, octahedron) show that IsPlanar
+  is inhabited — something PR #16074 leaves as future work.
 -/
 import Mathlib.GroupTheory.Perm.Cycle.Basic
 import EulerMathlib

@@ -24,8 +24,8 @@ darts in the same vertex orbit get the same location.
 
 This is a simpler notion than `GeometricEmbedding` (no non-crossing
 condition); it just records "here is where to draw each vertex".
-The fact that the resulting picture has no crossings is verified
-visually for each concrete example.
+Note: non-crossing is not formally verified here — this structure
+only records vertex positions, not planarity of the drawing.
 -/
 structure VertexLayout {n : ℕ} (M : CombinatorialMap (Fin n)) where
   pos : Fin n → Point
