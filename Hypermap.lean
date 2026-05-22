@@ -394,6 +394,46 @@ theorem torusCMap_fails_vanStaudt :
     Fintype.card torusCMap.Edge := by
   native_decide
 
+/-! ## Block 13: Jordan-free Euler for concrete CMaps via vanStaudt_arith
+
+Each concrete planar CMap satisfies V + F = E + 2 derived using ONLY:
+- The Van Staudt partition (verified by native_decide)
+- The arithmetic core vanStaudt_arith (proved in EulerMathlib by omega)
+
+NO Jordan curve theorem, NO PlanarGraph induction, NO topology.
+Pure arithmetic + verified partition.
+-/
+
+theorem singleEdgeMap_euler_jordan_free :
+    Fintype.card singleEdgeMap.Vertex + Fintype.card singleEdgeMap.Face =
+    Fintype.card singleEdgeMap.Edge + 2 :=
+  PlanarGraph.vanStaudt_arith _ _ _
+    (by native_decide) (by native_decide) singleEdgeMap_vanStaudt
+
+theorem triangleMap_euler_jordan_free :
+    Fintype.card triangleMap.Vertex + Fintype.card triangleMap.Face =
+    Fintype.card triangleMap.Edge + 2 :=
+  PlanarGraph.vanStaudt_arith _ _ _
+    (by native_decide) (by native_decide) triangleMap_vanStaudt
+
+theorem k4Map_euler_jordan_free :
+    Fintype.card k4Map.Vertex + Fintype.card k4Map.Face =
+    Fintype.card k4Map.Edge + 2 :=
+  PlanarGraph.vanStaudt_arith _ _ _
+    (by native_decide) (by native_decide) k4Map_vanStaudt
+
+theorem cubeMap_euler_jordan_free :
+    Fintype.card cubeMap.Vertex + Fintype.card cubeMap.Face =
+    Fintype.card cubeMap.Edge + 2 :=
+  PlanarGraph.vanStaudt_arith _ _ _
+    (by native_decide) (by native_decide) cubeMap_vanStaudt
+
+theorem octahedronMap_euler_jordan_free :
+    Fintype.card octahedronMap.Vertex + Fintype.card octahedronMap.Face =
+    Fintype.card octahedronMap.Edge + 2 :=
+  PlanarGraph.vanStaudt_arith _ _ _
+    (by native_decide) (by native_decide) octahedronMap_vanStaudt
+
 
 
 /-! ## Status
