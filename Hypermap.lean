@@ -509,6 +509,48 @@ theorem collapsed_is_identity : ∀ d, collapsedEdge d = d := by
 
 end SingleEdgeWalkupTest
 
+/-! ## Block 16: Walkup test on triangleMap
+
+Collapse the first edge {0,1} of triangleMap and verify both darts
+become fixed in the resulting edge permutation. The other edges
+{2,3} and {4,5} remain untouched.
+-/
+
+namespace TriangleWalkupTest
+
+def collapsedEdge : Fin 6 → Fin 6 :=
+  CombinatorialMap.collapseEdge triangleMap.edgePerm ⟨0, by decide⟩
+
+theorem collapsed_fixes_0 : collapsedEdge ⟨0, by decide⟩ = ⟨0, by decide⟩ := by
+  unfold collapsedEdge
+  exact CombinatorialMap.collapseEdge_fixes_r _ _
+
+theorem collapsed_fixes_1 : collapsedEdge ⟨1, by decide⟩ = ⟨1, by decide⟩ := by
+  unfold collapsedEdge
+  have h_eq : triangleMap.edgePerm ⟨0, by decide⟩ = ⟨1, by decide⟩ := by native_decide
+  rw [← h_eq]
+  exact CombinatorialMap.collapseEdge_fixes_pr _ _
+
+/-- Darts 2 and 3 (the other edge) are untouched by the collapse. -/
+theorem collapsed_preserves_2 :
+    collapsedEdge ⟨2, by decide⟩ = triangleMap.edgePerm ⟨2, by decide⟩ := by
+  unfold collapsedEdge
+  apply CombinatorialMap.collapseEdge_eq_orig
+  · decide
+  · -- 2 ≠ edgePerm 0 = 1
+    have h_eq : triangleMap.edgePerm ⟨0, by decide⟩ = ⟨1, by decide⟩ := by native_decide
+    rw [h_eq]; decide
+
+theorem collapsed_preserves_3 :
+    collapsedEdge ⟨3, by decide⟩ = triangleMap.edgePerm ⟨3, by decide⟩ := by
+  unfold collapsedEdge
+  apply CombinatorialMap.collapseEdge_eq_orig
+  · decide
+  · have h_eq : triangleMap.edgePerm ⟨0, by decide⟩ = ⟨1, by decide⟩ := by native_decide
+    rw [h_eq]; decide
+
+end TriangleWalkupTest
+
 
 
 /-! ## Status
