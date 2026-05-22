@@ -621,6 +621,30 @@ theorem platonic_pairs_classification (p q : ℕ)
     nlinarith
   interval_cases p <;> interval_cases q <;> omega
 
+/--
+**Platonic Solid Classification Theorem**:
+Any regular planar polyhedron (every face has p ≥ 3 edges, every vertex
+has q ≥ 3 incident edges, pF = qV = 2E) must satisfy
+(p, q) ∈ {(3,3), (3,4), (4,3), (3,5), (5,3)}.
+
+These are precisely the tetrahedron, cube, octahedron, dodecahedron,
+and icosahedron.
+
+This combines:
+- `platonic_constraint` (Euler → 2p+2q > pq)
+- `platonic_pairs_classification` (interval analysis)
+-/
+theorem platonic_classification (p q V E F : ℕ)
+    (hp : 3 ≤ p) (hq : 3 ≤ q)
+    (hfaces : p * F = 2 * E)
+    (hverts : q * V = 2 * E)
+    (hpos_E : 1 ≤ E)
+    (hplanar : V + F = E + 2) :
+    (p = 3 ∧ q = 3) ∨ (p = 3 ∧ q = 4) ∨ (p = 4 ∧ q = 3) ∨
+    (p = 3 ∧ q = 5) ∨ (p = 5 ∧ q = 3) :=
+  platonic_pairs_classification p q hp hq
+    (platonic_constraint p q V E F hp hq hfaces hverts hpos_E hplanar)
+
 -- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
