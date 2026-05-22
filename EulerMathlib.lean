@@ -219,6 +219,51 @@ example : PlanarGraph 4 6 4 := wheel_planar 3 (by omega)   -- W_3 = K_4
 example : PlanarGraph 5 8 5 := wheel_planar 4 (by omega)   -- W_4
 example : PlanarGraph 6 10 6 := wheel_planar 5 (by omega)  -- W_5
 
+-- ============================================================
+-- COMPLETE BIPARTITE K_{2,n}
+-- ============================================================
+-- K_{2,n} has 2+n vertices, 2n edges, and (when planarly drawn) n faces.
+-- Construct: start with edge AB (V=2, E=1, F=1), then for each of n vertices
+-- attach it as a leaf to A then close edge to B (splits a face).
+
+/-- K_{2,n} planar: V = n+2, E = 2n, F = n (for n ≥ 1). -/
+theorem k2n_planar (n : ℕ) (hn : 1 ≤ n) : PlanarGraph (n + 2) (2 * n) n := by
+  -- Start from singleEdge K_{2,1} witness: V=3, E=2, F=1
+  -- (Actually K_{2,1} = path on 3 vertices)
+  -- Build inductively: each new vertex adds 1 vertex, 2 edges, 1 face
+  induction n, hn using Nat.le_induction with
+  | base =>
+    -- K_{2,1}: V=3, E=2, F=1 (a path A-C-B)
+    -- (n+2, 2n, n) = (3, 2, 1)
+    -- Build: point → addLeaf (V=2 E=1 F=1) → addLeaf (V=3 E=2 F=1)
+    exact .addLeaf 2 1 1 (.addLeaf 1 0 1 .point)
+  | succ k _ ih =>
+    -- We have K_{2,k}: V=k+2, E=2k, F=k.
+    -- Want K_{2,k+1}: V=k+3, E=2(k+1)=2k+2, F=k+1.
+    -- Operations: addLeaf (V=k+3 E=2k+1 F=k), addEdge (V=k+3 E=2k+2 F=k+1).
+    have h1 : PlanarGraph (k + 3) (2 * k + 1) k :=
+      .addLeaf (k + 2) (2 * k) k ih
+    have h2 : PlanarGraph (k + 3) (2 * k + 2) (k + 1) :=
+      .addEdge (k + 3) (2 * k + 1) k h1
+    have he : 2 * (k + 1) = 2 * k + 2 := by ring
+    rw [he]
+    exact h2
+
+-- K_{2,n} examples
+example : PlanarGraph 3 2 1 := k2n_planar 1 (by omega)
+example : PlanarGraph 5 6 3 := k2n_planar 3 (by omega)
+example : PlanarGraph 12 20 10 := k2n_planar 10 (by omega)
+
+-- ============================================================
+-- PYRAMID P_n: apex connected to a cycle of n vertices
+-- ============================================================
+-- Identical to a wheel W_n. We expose it under the geometric name.
+
+/-- Pyramid P_n is the same as wheel W_n. -/
+theorem pyramid_planar (n : ℕ) (hn : 3 ≤ n) :
+    PlanarGraph (n + 1) (2 * n) (n + 1) :=
+  wheel_planar n hn
+
 end PlanarGraph
 
 -- ============================================================
