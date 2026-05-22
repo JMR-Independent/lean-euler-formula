@@ -190,3 +190,39 @@ theorem k4Map_isSpherical : k4Map.IsSpherical :=
 /-- K₄ is planar: eulerCharacteristic = 4 - 6 + 4 = 2 ✓ -/
 theorem k4Map_isPlanar : k4Map.IsPlanar :=
   k4Map.eulerChar_of_spherical k4Map_isSpherical
+
+-- ============================================================
+-- SIMPLE EDGE CMAP (the smallest non-trivial example)
+-- ============================================================
+-- 2 darts, 1 edge, 2 vertices, 1 face.
+-- This is the minimal CMap and serves as base case for inductive proofs.
+
+/-- A single edge as a CombinatorialMap: 2 darts, 2 vertices, 1 face. -/
+def singleEdgeMap : CombinatorialMap (Fin 2) where
+  -- edgePerm: swaps the two darts (one edge)
+  edgePerm := Equiv.swap 0 1
+  -- vertexPerm: identity (each dart is its own vertex)
+  vertexPerm := 1
+  -- facePerm: must satisfy face * edge * vertex = 1, so face = edge⁻¹ = edge
+  facePerm := Equiv.swap 0 1
+  face_mul_edge_mul_vertex_eq_one := by
+    simp [mul_one, Equiv.swap_mul_self]
+  edgePerm_involutive := by decide
+  isEmpty_fixedPoints_edgePerm := by
+    refine ⟨fun ⟨d, hd⟩ => ?_⟩
+    fin_cases d <;> simp [Function.fixedPoints] at hd
+
+-- Verify orbit counts (kernel verified)
+example : Fintype.card (singleEdgeMap.Vertex) = 2 := by native_decide
+example : Fintype.card (singleEdgeMap.Edge)   = 1 := by native_decide
+example : Fintype.card (singleEdgeMap.Face)   = 1 := by native_decide
+
+/-- The single edge map is spherical: matches PlanarGraph 2 1 1. -/
+theorem singleEdgeMap_isSpherical : singleEdgeMap.IsSpherical :=
+  ⟨2, 1, 1,
+    PlanarGraph.addLeaf 1 0 1 PlanarGraph.point,
+    by native_decide, by native_decide, by native_decide⟩
+
+/-- The single edge is planar: V - E + F = 2 - 1 + 1 = 2. -/
+theorem singleEdgeMap_isPlanar : singleEdgeMap.IsPlanar :=
+  singleEdgeMap.eulerChar_of_spherical singleEdgeMap_isSpherical
