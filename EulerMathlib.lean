@@ -1027,9 +1027,10 @@ end PlanarGraph
 
 open SimpleGraph in
 /--
-A `PlanarEmbedding G` witnesses that the graph `G` can be embedded
-in the plane: it gives a face count and a `PlanarGraph` witness whose
-vertex and edge counts match those of `G`.
+A `PlanarEmbedding G` is a combinatorial certificate: a face count `f`
+together with a `PlanarGraph` witness whose vertex and edge counts match
+those of `G`. This witnesses Euler compatibility (V - E + F = 2) but
+does not encode a geometric embedding or prove absence of edge crossings.
 -/
 structure PlanarEmbedding {α : Type*} [Fintype α]
     (G : SimpleGraph α) [DecidableRel G.Adj] where
