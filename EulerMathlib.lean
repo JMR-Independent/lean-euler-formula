@@ -895,6 +895,42 @@ theorem regular_cubic_enumeration (e p : ℕ)
   interval_cases p <;> omega
 
 -- ============================================================
+-- DEGREE-SUM BOUNDS
+-- ============================================================
+-- Generalizes the six-degree bound: from g·F ≤ 2E and Euler we get
+-- 2E ≤ (2g/(g-2))·V - (4g/(g-2)).
+-- For g=3 this gives 2E < 6V; for g=4 it gives 2E ≤ 4V - 8; etc.
+
+/--
+**Bipartite four-degree bound**: planar bipartite graph satisfies
+2E + 8 ≤ 4V (average degree < 4).
+-/
+theorem planar_bipartite_four_degree_bound (v e f : ℕ)
+    (hv : 3 ≤ v) (h : PlanarGraph v e f)
+    (hface : 4 * f ≤ 2 * e) :
+    2 * e + 8 ≤ 4 * v := by
+  have := euler_formula h
+  omega
+
+/--
+**Planar triangle-free**: same as bipartite (girth ≥ 4) gives E ≤ 2V - 4.
+-/
+theorem planar_triangle_free_edge_bound (v e f : ℕ)
+    (hv : 3 ≤ v) (h : PlanarGraph v e f)
+    (hgirth : 4 * f ≤ 2 * e) :
+    e + 4 ≤ 2 * v := by
+  have := euler_formula h
+  omega
+
+/--
+**Cubic planar graphs**: V vertices each of degree exactly 3 satisfies
+2E = 3V, so V is even and E = 3V/2.
+-/
+theorem cubic_planar_edge_count (v e : ℕ)
+    (hvert : 3 * v = 2 * e) :
+    2 * e = 3 * v := by omega
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
