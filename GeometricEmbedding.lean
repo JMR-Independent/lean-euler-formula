@@ -35,6 +35,22 @@ structure VertexLayout {n : ℕ} (M : CombinatorialMap (Fin n)) where
 namespace CombinatorialMap
 
 -- ============================================================
+-- SINGLE EDGE LAYOUT
+-- ============================================================
+-- Two vertices on the x-axis at (0,0) and (1,0).
+
+/-- Single edge layout: two endpoints. -/
+def singleEdgeLayout : VertexLayout singleEdgeMap where
+  pos d := match d with
+    | ⟨0, _⟩ => (0, 0)
+    | _      => (1, 0)
+  same_vertex_same_pos := by decide
+
+theorem singleEdge_layout_distinct :
+    singleEdgeLayout.pos ⟨0, by decide⟩ ≠ singleEdgeLayout.pos ⟨1, by decide⟩ := by
+  simp [singleEdgeLayout]
+
+-- ============================================================
 -- TRIANGLE LAYOUT
 -- ============================================================
 -- Equilateral triangle: A=(0,0), B=(1,0), C=(1/2, √3/2)
