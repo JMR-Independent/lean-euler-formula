@@ -809,6 +809,42 @@ theorem triangulation_combined (v e f : ℕ)
   omega
 
 -- ============================================================
+-- SIMPLICIAL REGULAR POLYHEDRA
+-- ============================================================
+-- Regular triangulations: triangular faces + q-regular vertex degree.
+-- From triangulation_face_count: F = 2V - 4.
+-- From q-regularity: q*V = 2E = 3F = 3(2V-4) = 6V - 12.
+-- So V*(q-6) = -12, i.e. V = 12/(6-q) when q < 6.
+
+/--
+**Regular triangulation constraint**: if every face is triangular and
+every vertex has degree q ≥ 3, then q < 6 and V = 12/(6-q).
+The 3 solutions: q=3 (tetrahedron V=4), q=4 (octahedron V=6),
+q=5 (icosahedron V=12).
+-/
+theorem regular_triangulation_constraint (v e f q : ℕ)
+    (hv : 3 ≤ v) (hq : 3 ≤ q)
+    (h : PlanarGraph v e f)
+    (hface : 3 * f = 2 * e)
+    (hvert : q * v = 2 * e) :
+    v * (6 - q) = 12 ∧ q < 6 := by
+  have hE := euler_formula h
+  refine ⟨?_, ?_⟩
+  · nlinarith [hE, hface, hvert, hv]
+  · -- If q ≥ 6 then qV ≥ 6V > 2E = 3F = 6V-12, contradiction.
+    by_contra h6
+    push_neg at h6
+    nlinarith [hE, hface, hvert, hv]
+
+/-- The three regular triangulations: V=4 (tetrahedron), V=6 (octahedron),
+V=12 (icosahedron). -/
+theorem regular_triangulation_enumeration (v : ℕ) (q : ℕ)
+    (hv : 3 ≤ v) (hq : 3 ≤ q) (hq6 : q < 6)
+    (heq : v * (6 - q) = 12) :
+    (q = 3 ∧ v = 4) ∨ (q = 4 ∧ v = 6) ∨ (q = 5 ∧ v = 12) := by
+  interval_cases q <;> omega
+
+-- ============================================================
 -- LADDER L_n: two parallel paths connected by n rungs
 -- ============================================================
 -- L_n = K_2 × P_n: V = 2n, E = 3n - 2, F = n
