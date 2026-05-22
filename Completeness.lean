@@ -1,12 +1,16 @@
 /-
-  Completeness: every connected CombinatorialMap satisfies eulerCharacteristic = 2
+  Edge count and the limits of completeness.
 
-  Strategy:
   1. edge_count_eq: Fintype.card M.Edge = Fintype.card D / 2
      (fixed-point-free involution → every orbit has size 2)
-  2. vertex_face_count_eq: Fintype.card M.Vertex + Fintype.card M.Face = Fintype.card D / 2 + 2
-     (induction on darts: contraction-deletion)
-  3. Combine: eulerCharacteristic = V - E + F = 2
+
+  2. The naive claim "every connected CMap has eulerCharacteristic = 2"
+     is FALSE. The torus CMap (torusCMap) is connected but has χ = 0.
+     Connectivity alone does not imply planarity.
+
+  3. The correct statement needs a planarity / genus-0 hypothesis.
+     See IsPlanarIffIsSpherical.lean for the equivalence
+     IsSpherical ↔ IsPlanar (= eulerCharacteristic = 2).
 -/
 import Mathlib.GroupTheory.Perm.Cycle.Type
 import Mathlib.GroupTheory.Perm.Finite
