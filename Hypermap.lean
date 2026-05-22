@@ -296,6 +296,28 @@ theorem walkupAt_image_safe (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ d : Fin (n+
   · intro hcontra; exact h₁ (π.injective (hcontra.trans h.1.symm))
   · intro hcontra; exact h₂ (π.injective (hcontra.trans h.2.symm))
 
+/-! ## Block 10: composition preservation
+
+Key theorem: if face, edge, vertex all fix {r₁, r₂} and their composition
+is the identity, then their walkups also compose to the identity.
+-/
+
+/-- Composition of walkupAt preserves the identity group relation. -/
+theorem walkupAt_composition
+    (f e v : Equiv.Perm (Fin (n+1)))
+    (r₁ r₂ : Fin (n+1))
+    (hf : MapsFixedPair f r₁ r₂)
+    (he : MapsFixedPair e r₁ r₂)
+    (hv : MapsFixedPair v r₁ r₂)
+    (hcomp : ∀ d, f (e (v d)) = d)
+    (d : Fin (n+1)) :
+    walkupAt f r₁ r₂ (walkupAt e r₁ r₂ (walkupAt v r₁ r₂ d)) = d := by
+  -- Since all three perms fix r₁ and r₂, walkupAt = original perm pointwise.
+  rw [walkupAt_of_fixed v r₁ r₂ hv d]
+  rw [walkupAt_of_fixed e r₁ r₂ he (v d)]
+  rw [walkupAt_of_fixed f r₁ r₂ hf (e (v d))]
+  exact hcomp d
+
 end CombinatorialMap
 
 /-! ## Status
