@@ -102,7 +102,7 @@ theorem cube_doubling_impossible (k : ℕ) {F : Type*} [Field F] [Algebra ℚ F]
   have hint : IsIntegral ℚ α := IsIntegral.of_finite ℚ α
   -- α is a root of X³ - 2
   have heval : aeval α (X ^ 3 - C (2 : ℚ)) = 0 := by
-    simp [map_sub, map_pow, hα]
+    rw [map_sub, map_pow, aeval_X, aeval_C, hα, sub_self]
   -- Since X³ - 2 is irreducible, it equals the minimal polynomial of α
   have heq : X ^ 3 - C (2 : ℚ) = minpoly ℚ α := by
     have h := X_cube_sub_two_irreducible.eq_minpoly heval
@@ -116,4 +116,4 @@ theorem cube_doubling_impossible (k : ℕ) {F : Type*} [Field F] [Algebra ℚ F]
   -- But [F:ℚ] = 2^k, so 3 ∣ 2^k
   rw [hk] at h3dvd
   -- Since 3 is prime and 3 ∣ 2^k, we get 3 ∣ 2 — a contradiction
-  exact absurd (Nat.Prime.dvd_of_dvd_pow prime_three h3dvd) (by norm_num)
+  exact absurd (prime_three.dvd_of_dvd_pow h3dvd) (by norm_num)
