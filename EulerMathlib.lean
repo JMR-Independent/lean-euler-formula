@@ -836,7 +836,6 @@ theorem triangulation_combined (v e f : ℕ)
 every vertex has degree q ≥ 3, then q < 6 and 6V = qV + 12.
 The 3 solutions: q=3 (tetrahedron V=4), q=4 (octahedron V=6),
 q=5 (icosahedron V=12).
-
 -/
 theorem regular_triangulation_constraint (v e f q : ℕ)
     (hv : 3 ≤ v) (hq : 3 ≤ q)
@@ -1149,8 +1148,8 @@ theorem petersenGraph_egirth_ge_5 : 5 ≤ petersenGraph.egirth := by
     have h01 := w.adj_getVert_succ (show 0 < w.length by omega)
     have h12 := w.adj_getVert_succ (show 1 < w.length by omega)
     have h23 := w.adj_getVert_succ (show 2 < w.length by omega)
-    rw [hv3, ← hv0] at h23
-    exact petersenGraph_no_triangle _ _ _ h01 h12 h23
+    have heq3 : w.getVert 3 = w.getVert 0 := hv3.trans hv0.symm
+    exact petersenGraph_no_triangle _ _ _ h01 h12 (heq3 ▸ h23)
   · -- 4-cycle: extract cycle with distinct opposite vertices
     have hv4 : w.getVert 4 = v := by
       have h := SimpleGraph.Walk.getVert_length w; rw [h4eq] at h; exact h
@@ -1158,7 +1157,7 @@ theorem petersenGraph_egirth_ge_5 : 5 ≤ petersenGraph.egirth := by
     have h12 := w.adj_getVert_succ (show 1 < w.length by omega)
     have h23 := w.adj_getVert_succ (show 2 < w.length by omega)
     have h34 := w.adj_getVert_succ (show 3 < w.length by omega)
-    rw [hv4, ← hv0] at h34
+    have heq4 : w.getVert 4 = w.getVert 0 := hv4.trans hv0.symm
     have hinj := hw.getVert_injOn'
     have mem : ∀ k : ℕ, k ≤ 3 → k ∈ {i | i ≤ w.length - 1} := fun k hk => by
       simp only [Set.mem_setOf_eq]; omega
@@ -1166,7 +1165,7 @@ theorem petersenGraph_egirth_ge_5 : 5 ≤ petersenGraph.egirth := by
       absurd (hinj (mem 0 (by omega)) (mem 2 (by omega)) heq) (by norm_num)
     have h13 : w.getVert 1 ≠ w.getVert 3 := fun heq =>
       absurd (hinj (mem 1 (by omega)) (mem 3 (by omega)) heq) (by norm_num)
-    exact petersenGraph_no_4cycle _ _ _ _ ⟨h01, h12, h23, h34, h02, h13⟩
+    exact petersenGraph_no_4cycle _ _ _ _ ⟨h01, h12, h23, heq4 ▸ h34, h02, h13⟩
 
 /--
 **Petersen graph is not planarly embeddable.**
@@ -1263,8 +1262,8 @@ theorem heawoodGraph_egirth_ge_6 : 6 ≤ heawoodGraph.egirth := by
     have h01  := w.adj_getVert_succ (show 0 < w.length by omega)
     have h12  := w.adj_getVert_succ (show 1 < w.length by omega)
     have h23  := w.adj_getVert_succ (show 2 < w.length by omega)
-    rw [hv3, ← hv0] at h23
-    exact heawoodGraph_no_triangle _ _ _ h01 h12 h23
+    have heq3 : w.getVert 3 = w.getVert 0 := hv3.trans hv0.symm
+    exact heawoodGraph_no_triangle _ _ _ h01 h12 (heq3 ▸ h23)
   · -- 4-cycle
     have hv4  : w.getVert 4 = v := by
       have h := SimpleGraph.Walk.getVert_length w; rw [h4eq] at h; exact h
@@ -1272,7 +1271,7 @@ theorem heawoodGraph_egirth_ge_6 : 6 ≤ heawoodGraph.egirth := by
     have h12  := w.adj_getVert_succ (show 1 < w.length by omega)
     have h23  := w.adj_getVert_succ (show 2 < w.length by omega)
     have h34  := w.adj_getVert_succ (show 3 < w.length by omega)
-    rw [hv4, ← hv0] at h34
+    have heq4 : w.getVert 4 = w.getVert 0 := hv4.trans hv0.symm
     have hinj := hw.getVert_injOn'
     have mem  : ∀ k : ℕ, k ≤ 3 → k ∈ {i | i ≤ w.length - 1} := fun k hk => by
       simp only [Set.mem_setOf_eq]; omega
@@ -1280,7 +1279,7 @@ theorem heawoodGraph_egirth_ge_6 : 6 ≤ heawoodGraph.egirth := by
       absurd (hinj (mem 0 (by omega)) (mem 2 (by omega)) heq) (by norm_num)
     have h13 : w.getVert 1 ≠ w.getVert 3 := fun heq =>
       absurd (hinj (mem 1 (by omega)) (mem 3 (by omega)) heq) (by norm_num)
-    exact heawoodGraph_no_4cycle _ _ _ _ ⟨h01, h12, h23, h34, h02, h13⟩
+    exact heawoodGraph_no_4cycle _ _ _ _ ⟨h01, h12, h23, heq4 ▸ h34, h02, h13⟩
   · -- 5-cycle
     have hv5  : w.getVert 5 = v := by
       have h := SimpleGraph.Walk.getVert_length w; rw [h5eq] at h; exact h
@@ -1289,7 +1288,7 @@ theorem heawoodGraph_egirth_ge_6 : 6 ≤ heawoodGraph.egirth := by
     have h23  := w.adj_getVert_succ (show 2 < w.length by omega)
     have h34  := w.adj_getVert_succ (show 3 < w.length by omega)
     have h45  := w.adj_getVert_succ (show 4 < w.length by omega)
-    rw [hv5, ← hv0] at h45
+    have heq5 : w.getVert 5 = w.getVert 0 := hv5.trans hv0.symm
     have hinj := hw.getVert_injOn'
     have mem  : ∀ k : ℕ, k ≤ 4 → k ∈ {i | i ≤ w.length - 1} := fun k hk => by
       simp only [Set.mem_setOf_eq]; omega
@@ -1304,7 +1303,7 @@ theorem heawoodGraph_egirth_ge_6 : 6 ≤ heawoodGraph.egirth := by
     have h24 : w.getVert 2 ≠ w.getVert 4 := fun heq =>
       absurd (hinj (mem 2 (by omega)) (mem 4 (by omega)) heq) (by norm_num)
     exact heawoodGraph_no_5cycle _ _ _ _ _
-      ⟨h01, h12, h23, h34, h45, h02, h03, h13, h14, h24⟩
+      ⟨h01, h12, h23, h34, heq5 ▸ h45, h02, h03, h13, h14, h24⟩
 
 /--
 **Heawood graph is not planarly embeddable.**
