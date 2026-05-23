@@ -48,8 +48,11 @@ private lemma cubePoly_isEisensteinAt :
                  Ideal.mem_span_singleton] <;>
       norm_num
   · -- constant coefficient -2 is not in (2)² = (4)
-    simp only [cubePoly, Ideal.span_singleton_pow, Ideal.mem_span_singleton,
-               coeff_sub, coeff_X_pow, coeff_C]
+    have hc : cubePoly.coeff 0 = -2 := by
+      simp [cubePoly, coeff_sub, coeff_X_pow, coeff_C]
+    have h4 : (Ideal.span {(2 : ℤ)}) ^ 2 = Ideal.span {(4 : ℤ)} := by
+      rw [Ideal.span_singleton_pow]; norm_num
+    rw [hc, h4, Ideal.mem_span_singleton]
     norm_num
 
 /-- X³ - 2 is irreducible over ℤ. -/
