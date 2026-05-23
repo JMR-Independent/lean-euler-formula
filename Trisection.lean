@@ -44,9 +44,7 @@ private lemma cubePoly_isEisensteinAt :
     intro n hn
     simp only [cubePoly, natDegree_X_pow_sub_C] at hn
     interval_cases n <;>
-      simp only [cubePoly, coeff_sub, coeff_X_pow, coeff_C,
-                 Ideal.mem_span_singleton] <;>
-      norm_num
+      (simp [cubePoly, coeff_sub, coeff_X_pow, coeff_C, Ideal.mem_span_singleton]; norm_num)
   · -- constant coefficient -2 is not in (2)² = (4)
     have hc : cubePoly.coeff 0 = -2 := by
       simp [cubePoly, coeff_sub, coeff_X_pow, coeff_C]
