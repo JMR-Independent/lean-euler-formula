@@ -14,6 +14,7 @@
   is inhabited — something PR #16074 leaves as future work.
 -/
 import Mathlib.GroupTheory.Perm.Cycle.Basic
+import Mathlib.GroupTheory.Perm.Cycle.Factors
 import EulerMathlib
 
 -- ============================================================
@@ -46,6 +47,14 @@ abbrev Face   := Quotient (Equiv.Perm.SameCycle.setoid M.facePerm)
 noncomputable instance [Fintype D] : Fintype M.Vertex := Fintype.ofFinite M.Vertex
 noncomputable instance [Fintype D] : Fintype M.Edge   := Fintype.ofFinite M.Edge
 noncomputable instance [Fintype D] : Fintype M.Face   := Fintype.ofFinite M.Face
+
+-- Computable instances when D has decidable equality (enables native_decide for card)
+instance [Fintype D] [DecidableEq D] : Fintype M.Vertex :=
+  Quotient.fintype (Equiv.Perm.SameCycle.setoid M.vertexPerm)
+instance [Fintype D] [DecidableEq D] : Fintype M.Edge :=
+  Quotient.fintype (Equiv.Perm.SameCycle.setoid M.edgePerm)
+instance [Fintype D] [DecidableEq D] : Fintype M.Face :=
+  Quotient.fintype (Equiv.Perm.SameCycle.setoid M.facePerm)
 
 /-- Euler characteristic: V - E + F -/
 noncomputable def eulerCharacteristic [Fintype D] : ℤ :=
@@ -106,13 +115,11 @@ def triangleMap : CombinatorialMap (Fin 6) where
   facePerm :=
     (Equiv.swap 0 5 * Equiv.swap 1 2 * Equiv.swap 3 4)⁻¹ *
     (Equiv.swap 0 1 * Equiv.swap 2 3 * Equiv.swap 4 5)⁻¹
-  face_mul_edge_mul_vertex_eq_one := by
-    simp [mul_assoc, mul_inv_cancel]
-  edgePerm_involutive := by
-    intro d; fin_cases d <;> simp [Equiv.swap, Equiv.Perm.mul_apply]
-  isEmpty_fixedPoints_edgePerm := by
-    refine ⟨fun ⟨d, hd⟩ => ?_⟩
-    fin_cases d <;> simp [Function.fixedPoints, Equiv.swap] at hd
+  face_mul_edge_mul_vertex_eq_one := by group
+  edgePerm_involutive := fun d => by fin_cases d <;> rfl
+  isEmpty_fixedPoints_edgePerm := ⟨fun ⟨d, hd⟩ => by
+    fin_cases d <;>
+    simp only [Function.IsFixedPt, Equiv.Perm.mul_apply, Equiv.swap_apply_def] at hd⟩
 
 -- Verify orbit counts by computation
 -- (These establish the IsSpherical witness)
@@ -172,10 +179,10 @@ def k4Map : CombinatorialMap (Fin 12) where
     Equiv.swap 4 11 * Equiv.swap 11 3 *
     Equiv.swap 6 10 * Equiv.swap 10 9
   face_mul_edge_mul_vertex_eq_one := by native_decide
-  edgePerm_involutive              := by native_decide
-  isEmpty_fixedPoints_edgePerm     := by
-    refine ⟨fun ⟨d, hd⟩ => ?_⟩
-    fin_cases d <;> simp [Function.fixedPoints] at hd
+  edgePerm_involutive := fun d => by fin_cases d <;> rfl
+  isEmpty_fixedPoints_edgePerm := ⟨fun ⟨d, hd⟩ => by
+    fin_cases d <;>
+    simp only [Function.IsFixedPt, Equiv.Perm.mul_apply, Equiv.swap_apply_def] at hd⟩
 
 -- Verify orbit counts
 example : Fintype.card (k4Map.Vertex) = 4 := by native_decide
@@ -207,10 +214,10 @@ def singleEdgeMap : CombinatorialMap (Fin 2) where
   facePerm := Equiv.swap 0 1
   face_mul_edge_mul_vertex_eq_one := by
     simp [mul_one, Equiv.swap_mul_self]
-  edgePerm_involutive := by decide
-  isEmpty_fixedPoints_edgePerm := by
-    refine ⟨fun ⟨d, hd⟩ => ?_⟩
-    fin_cases d <;> simp [Function.fixedPoints] at hd
+  edgePerm_involutive := fun d => by fin_cases d <;> rfl
+  isEmpty_fixedPoints_edgePerm := ⟨fun ⟨d, hd⟩ => by
+    fin_cases d <;>
+    simp only [Function.IsFixedPt, Equiv.swap_apply_def] at hd⟩
 
 -- Verify orbit counts (kernel verified)
 example : Fintype.card (singleEdgeMap.Vertex) = 2 := by native_decide
@@ -298,15 +305,11 @@ def cubeMap : CombinatorialMap (Fin 24) where
      Equiv.swap 4 9  * Equiv.swap 5 15 * Equiv.swap 7 10 *
      Equiv.swap 8 18 * Equiv.swap 11 21 * Equiv.swap 13 16 *
      Equiv.swap 14 19 * Equiv.swap 17 22 * Equiv.swap 20 23)⁻¹
-  face_mul_edge_mul_vertex_eq_one := by
-    -- face * edge * vertex = (vertex⁻¹ * edge⁻¹) * edge * vertex
-    --                      = vertex⁻¹ * (edge⁻¹ * edge) * vertex
-    --                      = vertex⁻¹ * 1 * vertex = 1
-    simp [mul_assoc, inv_mul_cancel]
+  face_mul_edge_mul_vertex_eq_one := by group
   edgePerm_involutive := by native_decide
-  isEmpty_fixedPoints_edgePerm := by
-    refine ⟨fun ⟨d, hd⟩ => ?_⟩
-    fin_cases d <;> simp [Function.fixedPoints] at hd
+  isEmpty_fixedPoints_edgePerm := ⟨fun ⟨d, hd⟩ => by
+    fin_cases d <;>
+    simp only [Function.IsFixedPt, Equiv.Perm.mul_apply, Equiv.swap_apply_def] at hd⟩
 
 -- Verify orbit counts (kernel)
 example : Fintype.card (cubeMap.Vertex) = 8 := by native_decide
@@ -315,7 +318,7 @@ example : Fintype.card (cubeMap.Face)   = 6 := by native_decide
 
 /-- The cube map is spherical: matches PlanarGraph 8 12 6. -/
 theorem cubeMap_isSpherical : cubeMap.IsSpherical :=
-  ⟨8, 12, 6, PlanarGraph.cube,
+  ⟨8, 12, 6, PlanarGraph.cube_witness,
     by native_decide, by native_decide, by native_decide⟩
 
 /-- The cube is planar: V - E + F = 8 - 12 + 6 = 2 ✓ -/
@@ -382,12 +385,11 @@ def octahedronMap : CombinatorialMap (Fin 24) where
      Equiv.swap 3 16  * Equiv.swap 5 11  * Equiv.swap 6 20 *
      Equiv.swap 7 17  * Equiv.swap 9 15  * Equiv.swap 10 21 *
      Equiv.swap 13 19 * Equiv.swap 14 22 * Equiv.swap 18 23)⁻¹
-  face_mul_edge_mul_vertex_eq_one := by
-    simp [mul_assoc, inv_mul_cancel]
+  face_mul_edge_mul_vertex_eq_one := by group
   edgePerm_involutive := by native_decide
-  isEmpty_fixedPoints_edgePerm := by
-    refine ⟨fun ⟨d, hd⟩ => ?_⟩
-    fin_cases d <;> simp [Function.fixedPoints] at hd
+  isEmpty_fixedPoints_edgePerm := ⟨fun ⟨d, hd⟩ => by
+    fin_cases d <;>
+    simp only [Function.IsFixedPt, Equiv.Perm.mul_apply, Equiv.swap_apply_def] at hd⟩
 
 -- Verify orbit counts (kernel)
 example : Fintype.card (octahedronMap.Vertex) = 6 := by native_decide
@@ -396,7 +398,7 @@ example : Fintype.card (octahedronMap.Face)   = 8 := by native_decide
 
 /-- The octahedron map is spherical: matches PlanarGraph 6 12 8. -/
 theorem octahedronMap_isSpherical : octahedronMap.IsSpherical :=
-  ⟨6, 12, 8, PlanarGraph.octahedron,
+  ⟨6, 12, 8, PlanarGraph.octahedron_witness,
     by native_decide, by native_decide, by native_decide⟩
 
 /-- The octahedron is planar: V - E + F = 6 - 12 + 8 = 2 ✓ -/

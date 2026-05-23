@@ -58,7 +58,7 @@ private lemma cubePoly_irreducible_int : Irreducible cubePoly :=
   cubePoly_isEisensteinAt.irreducible
     ((Ideal.span_singleton_prime (by norm_num : (2 : ℤ) ≠ 0)).mpr Int.prime_two)
     cubePoly_monic.isPrimitive
-    (by norm_num [cubePoly, natDegree_X_pow_sub_C])
+    (by simp only [cubePoly, natDegree_X_pow_sub_C]; norm_num)
 
 -- ============================================================
 -- STEP 2: X³ - 2 IS IRREDUCIBLE OVER ℚ (Gauss's lemma)
@@ -70,7 +70,8 @@ theorem X_cube_sub_two_irreducible : Irreducible (X ^ 3 - C (2 : ℚ)) := by
     (Polynomial.IsPrimitive.Int.irreducible_iff_irreducible_map_cast
       cubePoly_monic.isPrimitive).mp cubePoly_irreducible_int
   have hmap : cubePoly.map (Int.castRingHom ℚ) = X ^ 3 - C (2 : ℚ) := by
-    simp only [cubePoly, map_sub, map_pow, map_X, map_C, Int.cast_ofNat]
+    simp [cubePoly, Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_X,
+          Polynomial.map_C, Int.cast_ofNat]
   rwa [hmap] at key
 
 -- ============================================================
@@ -117,4 +118,4 @@ theorem cube_doubling_impossible (k : ℕ) {F : Type*} [Field F] [Algebra ℚ F]
   -- But [F:ℚ] = 2^k, so 3 ∣ 2^k
   rw [hk] at h3dvd
   -- Since 3 is prime and 3 ∣ 2^k, we get 3 ∣ 2 — a contradiction
-  exact absurd ((by norm_num : Prime (3 : ℕ)).dvd_of_dvd_pow h3dvd) (by norm_num)
+  exact absurd ((Nat.Prime.prime (by norm_num : Nat.Prime 3)).dvd_of_dvd_pow h3dvd) (by norm_num)
