@@ -65,11 +65,12 @@ private lemma cubePoly_irreducible_int : Irreducible cubePoly :=
 
 /-- The polynomial X³ - 2 is irreducible over ℚ. -/
 theorem X_cube_sub_two_irreducible : Irreducible (X ^ 3 - C (2 : ℚ)) := by
-  have h := cubePoly_monic.isPrimitive.Int.irreducible_iff_irreducible_map_cast.mp
-    cubePoly_irreducible_int
-  convert h using 1
-  simp [cubePoly, Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_X,
-        Polynomial.map_C]
+  have key : Irreducible (cubePoly.map (Int.castRingHom ℚ)) :=
+    cubePoly_monic.isPrimitive.Int.irreducible_iff_irreducible_map_cast.mp
+      cubePoly_irreducible_int
+  have hmap : cubePoly.map (Int.castRingHom ℚ) = X ^ 3 - C (2 : ℚ) := by
+    simp only [cubePoly, map_sub, map_pow, map_X, map_C, Int.cast_ofNat]
+  rwa [hmap] at key
 
 -- ============================================================
 -- STEP 3: dim_ℚ AdjoinRoot(X³ - 2) = 3
