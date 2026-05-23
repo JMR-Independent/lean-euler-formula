@@ -99,6 +99,19 @@ If K₃,₃ were embedded planarly: Euler gives f = 5, but then 4·5 = 20 > 2·9
 theorem k33_not_planar : ¬ ∃ f, PlanarGraph 6 9 f ∧ 4 * f ≤ 2 * 9 := by
   rintro ⟨f, h, hf⟩; have := euler_formula h; omega
 
+/-- **K_n is not planar for any n ≥ 5.**
+The complete graph on n vertices has 2E = n(n−1). For a planar embedding with 3F ≤ 2E
+(all faces of degree ≥ 3), Euler gives E ≤ 3V − 6, i.e. 2E ≤ 6n − 12. But
+(n−4)(n−3) > 0 for n ≥ 5 implies n(n−1) > 6n − 12, so 2E > 6n − 12. Contradiction.
+Subsumes `k5_not_planar` and `k33_not_planar`; yields the infinite non-planar family. -/
+theorem kn_not_planar (n : ℕ) (hn : 5 ≤ n) :
+    ¬ ∃ (e f : ℕ), PlanarGraph n e f ∧ 2 * e = n * (n - 1) ∧ 3 * f ≤ 2 * e := by
+  intro ⟨e, f, h, he, hf⟩
+  have heul := euler_formula h
+  zify [show 1 ≤ n from by omega] at he hn hf heul
+  nlinarith [mul_pos (show (0 : ℤ) < (n : ℤ) - 4 from by linarith)
+                     (show (0 : ℤ) < (n : ℤ) - 3 from by linarith)]
+
 -- Square C₄: 4 vertices, 4 edges, 2 faces
 theorem square : PlanarGraph 4 4 2 :=
   .addEdge 4 3 1 (.addLeaf 3 2 1 (.addLeaf 2 1 1 (.addLeaf 1 0 1 .point)))
@@ -1321,3 +1334,40 @@ theorem heawoodGraph_not_planarly_embeddable :
   rintro ⟨⟨f, h⟩, hf⟩
   simp only [Kn_vertices, Heawood_edges] at h
   exact PlanarGraph.heawood_not_planar ⟨f, h, hf⟩
+
+-- ============================================================
+-- PETERSEN GRAPH: CHROMATIC NUMBER = 3
+-- ============================================================
+-- The Petersen graph is 3-colorable: it has chromatic number exactly 3.
+-- Upper bound: explicit 3-coloring found by native_decide.
+-- Lower bound: no 2-coloring exists — the 5-cycle (odd cycle) makes it
+-- non-bipartite, which native_decide verifies by exhaustive search.
+-- Conclusion: chromaticNumber = 3 via Mathlib's coloring API.
+
+/-- The Petersen graph admits a proper 3-coloring. -/
+private lemma petersen_3coloring_exists :
+    ∃ f : Fin 10 → Fin 3,
+      ∀ i j : Fin 10, petersenGraph.Adj i j → f i ≠ f j := by
+  native_decide
+
+/-- No proper 2-coloring of the Petersen graph exists (it contains a 5-cycle). -/
+private lemma petersen_no_2coloring :
+    ¬ ∃ f : Fin 10 → Fin 2,
+        ∀ i j : Fin 10, petersenGraph.Adj i j → f i ≠ f j := by
+  native_decide
+
+theorem petersenGraph_colorable_3 : petersenGraph.Colorable 3 :=
+  let ⟨f, hf⟩ := petersen_3coloring_exists
+  ⟨SimpleGraph.Coloring.mk f (fun {_ _} h => hf _ _ h)⟩
+
+theorem petersenGraph_not_colorable_2 : ¬ petersenGraph.Colorable 2 := by
+  intro ⟨c⟩
+  exact petersen_no_2coloring ⟨⇑c, fun i j h => c.valid h⟩
+
+/-- **The Petersen graph has chromatic number 3.**
+It is 3-colorable (explicit witness) but not 2-colorable (has an odd 5-cycle),
+so exactly 3 colors are needed. Proved using Mathlib's `chromaticNumber` API. -/
+theorem petersenGraph_chromaticNumber_eq_3 :
+    petersenGraph.chromaticNumber = 3 :=
+  SimpleGraph.chromaticNumber_eq_iff_colorable_not_colorable.mpr
+    ⟨petersenGraph_colorable_3, petersenGraph_not_colorable_2⟩

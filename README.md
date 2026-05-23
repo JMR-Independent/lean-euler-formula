@@ -14,8 +14,10 @@ No `sorry`. CI on every commit.
 | `platonic_classification` | The five Platonic solids (Wiedijk #50) |
 | `petersenGraph_egirth_ge_5` | Petersen graph has girth ≥ 5 (formally proved, no hypothesis) |
 | `heawoodGraph_egirth_ge_6` | Heawood graph has girth ≥ 6 (formally proved, no hypothesis) |
+| `kn_not_planar` | K_n is not planar for any n ≥ 5 (infinite family, pure arithmetic) |
 | `petersen_not_planar`, `heawood_not_planar` | Non-planarity via girth bounds |
 | `girth_planarity_bound` | Edge bound from girth; implies K₅ and K₃,₃ cases |
+| `petersenGraph_chromaticNumber_eq_3` | Petersen graph needs exactly 3 colors (Mathlib chromaticNumber API) |
 | `edge_count_eq` | \|E\| = \|D\|/2 for any fixed-point-free involution |
 | `eulerChar_of_spherical` | `IsSpherical → IsPlanar` via the CMap bridge |
 | `isSpherical_iff_isPlanar` | Equivalence between the two internal planarity notions |
@@ -30,11 +32,20 @@ families, Platonic solid classification, non-planarity of K₅ and K₃,₃
 octahedron, and a Jordan-free arithmetic derivation for explicit maps.
 
 Petersen and Heawood are formally defined as `SimpleGraph (Fin n)` instances
-with machine-verified edge counts. Their girth bounds are now formally proved:
+with machine-verified edge counts. Their girth bounds are formally proved:
 `petersenGraph_egirth_ge_5` and `heawoodGraph_egirth_ge_6` show all cycles
-have length ≥ 5 and ≥ 6 respectively, using `Walk.IsCycle.getVert_injOn` and
-`adj_getVert_succ` from Mathlib, with `native_decide` for the finite triangle
-and 4-cycle-free checks.
+have length ≥ 5 and ≥ 6 respectively, using `Walk.IsCycle.getVert_injOn'` and
+`adj_getVert_succ` from Mathlib, with `native_decide` for the finite cycle-free checks.
+
+`kn_not_planar` establishes the infinite family: K_n is not planar for every n ≥ 5,
+proved by pure arithmetic from Euler's formula (no `native_decide`). The key step
+is `(n−4)(n−3) > 0` for n ≥ 5 via `nlinarith`, which forces 2E > 6n−12 while
+Euler bounds 2E ≤ 6n−12. This subsumes all previous K₅/K₃,₃ cases.
+
+`petersenGraph_chromaticNumber_eq_3` formally computes the chromatic number of the
+Petersen graph using Mathlib's `SimpleGraph.chromaticNumber` API. The graph needs
+exactly 3 colors: 3-colorability by explicit witness (`native_decide`), and
+non-2-colorability because the 5-cycle is an odd cycle (`native_decide`).
 
 What remains: constructing the spanning-tree partition algorithmically for
 arbitrary CMaps (currently verified by `native_decide` on concrete instances),
