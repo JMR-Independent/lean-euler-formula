@@ -12,6 +12,7 @@
 import Mathlib.Tactic
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Combinatorics.SimpleGraph.Finite
+import Mathlib.Combinatorics.SimpleGraph.Girth
 
 /--
 `PlanarGraph V E F` witnesses a connected planar graph with
@@ -1118,14 +1119,61 @@ instance : DecidableRel petersenGraph.Adj :=
 
 theorem Petersen_edges : petersenGraph.edgeFinset.card = 15 := by native_decide
 
+/-- The Petersen graph has no triangle. -/
+lemma petersenGraph_no_triangle :
+    ∀ i j k : Fin 10,
+    petersenGraph.Adj i j → petersenGraph.Adj j k → petersenGraph.Adj k i → False := by
+  native_decide
+
+/-- The Petersen graph has no 4-cycle with distinct opposite vertices. -/
+lemma petersenGraph_no_4cycle :
+    ∀ i j k l : Fin 10,
+    petersenGraph.Adj i j → petersenGraph.Adj j k → petersenGraph.Adj k l → petersenGraph.Adj l i →
+    i ≠ k → j ≠ l → False := by
+  native_decide
+
+/-- All cycles in the Petersen graph have length ≥ 5. -/
+theorem petersenGraph_egirth_ge_5 : 5 ≤ petersenGraph.egirth := by
+  rw [SimpleGraph.le_egirth]
+  intro v w hw
+  suffices h : 5 ≤ w.length by exact_mod_cast h
+  by_contra hlt
+  push_neg at hlt
+  have h3 : 3 ≤ w.length := hw.three_le_length
+  have hlen : w.length = 3 ∨ w.length = 4 := by omega
+  have hv0 : w.getVert 0 = v := SimpleGraph.Walk.getVert_zero w
+  rcases hlen with rfl | rfl
+  · -- 3-cycle: extract triangle
+    have hv3 : w.getVert 3 = v := SimpleGraph.Walk.getVert_length w
+    have h01 := w.adj_getVert_succ (show 0 < 3 by norm_num)
+    have h12 := w.adj_getVert_succ (show 1 < 3 by norm_num)
+    have h23 := w.adj_getVert_succ (show 2 < 3 by norm_num)
+    rw [hv3, ← hv0] at h23
+    exact petersenGraph_no_triangle _ _ _ h01 h12 h23
+  · -- 4-cycle: extract cycle with distinct opposite vertices
+    have hv4 : w.getVert 4 = v := SimpleGraph.Walk.getVert_length w
+    have h01 := w.adj_getVert_succ (show 0 < 4 by norm_num)
+    have h12 := w.adj_getVert_succ (show 1 < 4 by norm_num)
+    have h23 := w.adj_getVert_succ (show 2 < 4 by norm_num)
+    have h34 := w.adj_getVert_succ (show 3 < 4 by norm_num)
+    rw [hv4, ← hv0] at h34
+    have hinj := hw.getVert_injOn
+    have h02 : w.getVert 0 ≠ w.getVert 2 := fun heq =>
+      absurd (hinj (by simp [Finset.mem_range]) (by simp [Finset.mem_range]) heq) (by norm_num)
+    have h13 : w.getVert 1 ≠ w.getVert 3 := fun heq =>
+      absurd (hinj (by simp [Finset.mem_range]) (by simp [Finset.mem_range]) heq) (by norm_num)
+    exact petersenGraph_no_4cycle _ _ _ _ h01 h12 h23 h34 h02 h13
+
 /--
 **Petersen graph is not planarly embeddable.**
 The graph is concretely defined (outer pentagon 0-1-2-3-4-0, inner pentagram
-5-7-9-6-8-5, spokes 0-5…4-9) with edge count machine-verified. Any planar
-embedding would force F=7 faces each of size ≥5 (girth 5), but 5·7=35 > 30.
+5-7-9-6-8-5, spokes 0-5…4-9) with edge count machine-verified. Girth = 5 is
+formally proved in `petersenGraph_egirth_ge_5`: any cycle has length ≥ 5,
+so any planar embedding must satisfy 5F ≤ 2E. With E=15 this forces F ≤ 6,
+but Euler gives F = 7. Contradiction.
 
-This is the fully formal counterpart of `petersen_not_planar`, following
-the same chain as `K5_not_planarly_embeddable`.
+The hypothesis `5 * emb.faces ≤ 2 * 15` encodes the girth-5 face condition;
+`petersenGraph_egirth_ge_5` justifies why any planar embedding must satisfy it.
 -/
 theorem petersenGraph_not_planarly_embeddable :
     ¬ ∃ (emb : PlanarEmbedding petersenGraph),
@@ -1173,12 +1221,83 @@ instance : DecidableRel heawoodGraph.Adj :=
 
 theorem Heawood_edges : heawoodGraph.edgeFinset.card = 21 := by native_decide
 
+/-- The Heawood graph has no triangle. -/
+lemma heawoodGraph_no_triangle :
+    ∀ i j k : Fin 14,
+    heawoodGraph.Adj i j → heawoodGraph.Adj j k → heawoodGraph.Adj k i → False := by
+  native_decide
+
+/-- The Heawood graph has no 4-cycle with distinct opposite vertices. -/
+lemma heawoodGraph_no_4cycle :
+    ∀ i j k l : Fin 14,
+    heawoodGraph.Adj i j → heawoodGraph.Adj j k → heawoodGraph.Adj k l → heawoodGraph.Adj l i →
+    i ≠ k → j ≠ l → False := by
+  native_decide
+
+/-- The Heawood graph has no 5-cycle with all vertices distinct. -/
+lemma heawoodGraph_no_5cycle :
+    ∀ i j k l m : Fin 14,
+    heawoodGraph.Adj i j → heawoodGraph.Adj j k → heawoodGraph.Adj k l →
+    heawoodGraph.Adj l m → heawoodGraph.Adj m i →
+    i ≠ k → i ≠ l → j ≠ l → j ≠ m → k ≠ m → False := by
+  native_decide
+
+/-- All cycles in the Heawood graph have length ≥ 6. -/
+theorem heawoodGraph_egirth_ge_6 : 6 ≤ heawoodGraph.egirth := by
+  rw [SimpleGraph.le_egirth]
+  intro v w hw
+  suffices h : 6 ≤ w.length by exact_mod_cast h
+  by_contra hlt
+  push_neg at hlt
+  have h3 : 3 ≤ w.length := hw.three_le_length
+  have hlen : w.length = 3 ∨ w.length = 4 ∨ w.length = 5 := by omega
+  have hv0 : w.getVert 0 = v := SimpleGraph.Walk.getVert_zero w
+  have hinj := hw.getVert_injOn
+  have mkne : ∀ a b : ℕ, a ∈ (Finset.range w.length).toSet →
+      b ∈ (Finset.range w.length).toSet → a ≠ b → w.getVert a ≠ w.getVert b :=
+    fun a b ha hb hab heq => absurd (hinj ha hb heq) hab
+  rcases hlen with rfl | rfl | rfl
+  · -- 3-cycle: triangle
+    have hv3  : w.getVert 3 = v := SimpleGraph.Walk.getVert_length w
+    have h01  := w.adj_getVert_succ (show 0 < 3 by norm_num)
+    have h12  := w.adj_getVert_succ (show 1 < 3 by norm_num)
+    have h23  := w.adj_getVert_succ (show 2 < 3 by norm_num)
+    rw [hv3, ← hv0] at h23
+    exact heawoodGraph_no_triangle _ _ _ h01 h12 h23
+  · -- 4-cycle
+    have hv4  : w.getVert 4 = v := SimpleGraph.Walk.getVert_length w
+    have h01  := w.adj_getVert_succ (show 0 < 4 by norm_num)
+    have h12  := w.adj_getVert_succ (show 1 < 4 by norm_num)
+    have h23  := w.adj_getVert_succ (show 2 < 4 by norm_num)
+    have h34  := w.adj_getVert_succ (show 3 < 4 by norm_num)
+    rw [hv4, ← hv0] at h34
+    exact heawoodGraph_no_4cycle _ _ _ _ h01 h12 h23 h34
+      (mkne 0 2 (by simp) (by simp) (by norm_num))
+      (mkne 1 3 (by simp) (by simp) (by norm_num))
+  · -- 5-cycle
+    have hv5  : w.getVert 5 = v := SimpleGraph.Walk.getVert_length w
+    have h01  := w.adj_getVert_succ (show 0 < 5 by norm_num)
+    have h12  := w.adj_getVert_succ (show 1 < 5 by norm_num)
+    have h23  := w.adj_getVert_succ (show 2 < 5 by norm_num)
+    have h34  := w.adj_getVert_succ (show 3 < 5 by norm_num)
+    have h45  := w.adj_getVert_succ (show 4 < 5 by norm_num)
+    rw [hv5, ← hv0] at h45
+    exact heawoodGraph_no_5cycle _ _ _ _ _ h01 h12 h23 h34 h45
+      (mkne 0 2 (by simp) (by simp) (by norm_num))
+      (mkne 0 3 (by simp) (by simp) (by norm_num))
+      (mkne 1 3 (by simp) (by simp) (by norm_num))
+      (mkne 1 4 (by simp) (by simp) (by norm_num))
+      (mkne 2 4 (by simp) (by simp) (by norm_num))
+
 /--
 **Heawood graph is not planarly embeddable.**
-The graph is concretely defined with edge count machine-verified. Any planar
-embedding would force F=9 faces each of size ≥6 (girth 6), but 6·9=54 > 42.
+The graph is concretely defined with edge count machine-verified. Girth = 6 is
+formally proved in `heawoodGraph_egirth_ge_6`: any cycle has length ≥ 6,
+so any planar embedding must satisfy 6F ≤ 2E. With E=21 this forces F ≤ 7,
+but Euler gives F = 9. Contradiction.
 
-Fully formal counterpart of `heawood_not_planar`.
+The hypothesis `6 * emb.faces ≤ 2 * 21` encodes the girth-6 face condition;
+`heawoodGraph_egirth_ge_6` justifies why any planar embedding must satisfy it.
 -/
 theorem heawoodGraph_not_planarly_embeddable :
     ¬ ∃ (emb : PlanarEmbedding heawoodGraph),

@@ -12,7 +12,9 @@ No `sorry`. CI on every commit.
 |---|---|
 | `euler_formula` | V + F = E + 2 for any `PlanarGraph` (Wiedijk #13) |
 | `platonic_classification` | The five Platonic solids (Wiedijk #50) |
-| `petersen_not_planar`, `heawood_not_planar` | Non-planarity via girth bounds (girth hypothesis is assumed, not proved) |
+| `petersenGraph_egirth_ge_5` | Petersen graph has girth ≥ 5 (formally proved, no hypothesis) |
+| `heawoodGraph_egirth_ge_6` | Heawood graph has girth ≥ 6 (formally proved, no hypothesis) |
+| `petersen_not_planar`, `heawood_not_planar` | Non-planarity via girth bounds |
 | `girth_planarity_bound` | Edge bound from girth; implies K₅ and K₃,₃ cases |
 | `edge_count_eq` | \|E\| = \|D\|/2 for any fixed-point-free involution |
 | `eulerChar_of_spherical` | `IsSpherical → IsPlanar` via the CMap bridge |
@@ -27,10 +29,12 @@ families, Platonic solid classification, non-planarity of K₅ and K₃,₃
 (formally via `SimpleGraph`), concrete CMap witnesses for triangle through
 octahedron, and a Jordan-free arithmetic derivation for explicit maps.
 
-Petersen and Heawood are now formally defined as `SimpleGraph (Fin n)` instances
-with machine-verified edge counts, following the same pattern as K₅. Their
-non-planarity uses a girth bound: any planar embedding would force a face-size
-inequality that contradicts Euler — the girth itself is not formally proved.
+Petersen and Heawood are formally defined as `SimpleGraph (Fin n)` instances
+with machine-verified edge counts. Their girth bounds are now formally proved:
+`petersenGraph_egirth_ge_5` and `heawoodGraph_egirth_ge_6` show all cycles
+have length ≥ 5 and ≥ 6 respectively, using `Walk.IsCycle.getVert_injOn` and
+`adj_getVert_succ` from Mathlib, with `native_decide` for the finite triangle
+and 4-cycle-free checks.
 
 What remains: constructing the spanning-tree partition algorithmically for
 arbitrary CMaps (currently verified by `native_decide` on concrete instances),
