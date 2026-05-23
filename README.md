@@ -23,6 +23,7 @@ No `sorry`. CI on every commit.
 | `isSpherical_iff_isPlanar` | Equivalence between the two internal planarity notions |
 | `euler_via_vanStaudt` | Jordan-free Euler for any CMap satisfying the partition |
 | `torusCMap_fails_vanStaudt` | Torus as explicit non-planar counterexample |
+| `cube_doubling_impossible` | ∛2 not in any 2-power-degree extension of ℚ (Wiedijk #8) |
 
 ## Status
 
@@ -46,6 +47,10 @@ Euler bounds 2E ≤ 6n−12. This subsumes all previous K₅/K₃,₃ cases.
 Petersen graph using Mathlib's `SimpleGraph.chromaticNumber` API. The graph needs
 exactly 3 colors: 3-colorability by explicit witness (`native_decide`), and
 non-2-colorability because the 5-cycle is an odd cycle (`native_decide`).
+
+`cube_doubling_impossible` (Wiedijk #8) proves that no field F/ℚ with [F:ℚ] = 2^k contains an
+element cubing to 2. The algebraic core: X³ − 2 is irreducible over ℚ (Eisenstein at p=2 over ℤ,
+lifted by Gauss's lemma), so [ℚ(∛2):ℚ] = 3 divides [F:ℚ] = 2^k, forcing 3 ∣ 2, contradiction.
 
 What remains: constructing the spanning-tree partition algorithmically for
 arbitrary CMaps (currently verified by `native_decide` on concrete instances),

@@ -31,3 +31,6 @@ name = "GeometricEmbedding"
 
 [[lean_lib]]
 name = "Hypermap"
+
+[[lean_lib]]
+name = "Trisection"
