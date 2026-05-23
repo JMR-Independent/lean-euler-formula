@@ -59,7 +59,7 @@ private lemma det_row2_lin [CommRing K] (a b o : Fin 3 → K) (sa ta sb tb : K) 
 /-- P = (a⨯b)⨯(a'⨯b') = det[a,b,o] · (sa·tb·a − ta·sb·b) -/
 private lemma factP [CommRing K] (a b o : Fin 3 → K) (sa ta sb tb : K) :
     (a ⨯₃ b) ⨯₃ ((sa • a + ta • o) ⨯₃ (sb • b + tb • o)) =
-    Matrix.det ![ a, b, o] • (sa * tb • a - ta * sb • b) := by
+    Matrix.det ![ a, b, o] • ((sa * tb) • a - (ta * sb) • b) := by
   have h1 : Matrix.det ![ a, sa • a + ta • o, sb • b + tb • o] =
       -(ta * sb) * Matrix.det ![ a, b, o] := det_row1_lin a b o sa ta sb tb
   have h2 : Matrix.det ![ b, sa • a + ta • o, sb • b + tb • o] =
@@ -74,7 +74,7 @@ private lemma factP [CommRing K] (a b o : Fin 3 → K) (sa ta sb tb : K) :
 /-- Q = (a⨯c)⨯(a'⨯c') = det[a,c,o] · (sa·tc·a − ta·sc·c) -/
 private lemma factQ [CommRing K] (a c o : Fin 3 → K) (sa ta sc tc : K) :
     (a ⨯₃ c) ⨯₃ ((sa • a + ta • o) ⨯₃ (sc • c + tc • o)) =
-    Matrix.det ![ a, c, o] • (sa * tc • a - ta * sc • c) := by
+    Matrix.det ![ a, c, o] • ((sa * tc) • a - (ta * sc) • c) := by
   have h1 : Matrix.det ![ a, sa • a + ta • o, sc • c + tc • o] =
       -(ta * sc) * Matrix.det ![ a, c, o] := det_row1_lin a c o sa ta sc tc
   have h2 : Matrix.det ![ c, sa • a + ta • o, sc • c + tc • o] =
@@ -89,7 +89,7 @@ private lemma factQ [CommRing K] (a c o : Fin 3 → K) (sa ta sc tc : K) :
 /-- R = (b⨯c)⨯(b'⨯c') = det[b,c,o] · (sb·tc·b − tb·sc·c) -/
 private lemma factR [CommRing K] (b c o : Fin 3 → K) (sb tb sc tc : K) :
     (b ⨯₃ c) ⨯₃ ((sb • b + tb • o) ⨯₃ (sc • c + tc • o)) =
-    Matrix.det ![ b, c, o] • (sb * tc • b - tb * sc • c) := by
+    Matrix.det ![ b, c, o] • ((sb * tc) • b - (tb * sc) • c) := by
   have h1 : Matrix.det ![ b, sb • b + tb • o, sc • c + tc • o] =
       -(tb * sc) * Matrix.det ![ b, c, o] := det_row1_lin b c o sb tb sc tc
   have h2 : Matrix.det ![ c, sb • b + tb • o, sc • c + tc • o] =
@@ -125,9 +125,9 @@ private lemma det_smul_rows [CommRing K] (D E F : K) (P' Q' R' : Fin 3 → K) :
       |   0    sb·tc  −tb·sc  |
     has det = sa·ta·sb·tb·sc·tc − sa·ta·sb·tb·sc·tc = 0. -/
 private lemma det_coeff_zero [CommRing K] (a b c : Fin 3 → K) (sa ta sb tb sc tc : K) :
-    Matrix.det ![ sa * tb • a - ta * sb • b,
-                  sa * tc • a - ta * sc • c,
-                  sb * tc • b - tb * sc • c] = 0 := by
+    Matrix.det ![ (sa * tb) • a - (ta * sb) • b,
+                  (sa * tc) • a - (ta * sc) • c,
+                  (sb * tc) • b - (tb * sc) • c] = 0 := by
   rw [det_fin_three]
   dsimp only [Matrix.cons_val]
   simp only [Pi.smul_apply, Pi.sub_apply, smul_eq_mul]

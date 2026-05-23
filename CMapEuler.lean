@@ -446,19 +446,19 @@ end CombinatorialMap
 -- Each of our planar CMaps satisfies E ≤ 3V - 6.
 
 -- Triangle: V=3, E=3, 3 ≤ 3·3 - 6 = 3 ✓
-example : 3 * triangleMap.Face.card ≤ 2 * triangleMap.Edge.card := by
+example : 3 * Fintype.card triangleMap.Face ≤ 2 * Fintype.card triangleMap.Edge := by
   native_decide
 
 -- K₄: V=4, E=6, 6 ≤ 3·4 - 6 = 6 ✓ (saturates the bound)
-example : 3 * k4Map.Face.card ≤ 2 * k4Map.Edge.card := by
+example : 3 * Fintype.card k4Map.Face ≤ 2 * Fintype.card k4Map.Edge := by
   native_decide
 
 -- Cube: V=8, E=12, 12 ≤ 3·8 - 6 = 18 ✓
-example : 3 * cubeMap.Face.card ≤ 2 * cubeMap.Edge.card := by
+example : 3 * Fintype.card cubeMap.Face ≤ 2 * Fintype.card cubeMap.Edge := by
   native_decide
 
 -- Octahedron: V=6, E=12, 12 ≤ 3·6 - 6 = 12 ✓ (saturates the bound)
-example : 3 * octahedronMap.Face.card ≤ 2 * octahedronMap.Edge.card := by
+example : 3 * Fintype.card octahedronMap.Face ≤ 2 * Fintype.card octahedronMap.Edge := by
   native_decide
 
 -- ============================================================

@@ -28,7 +28,7 @@ open Polynomial IntermediateField
 -- STEP 1: X³ - 2 IS IRREDUCIBLE OVER ℤ (Eisenstein at p = 2)
 -- ============================================================
 
-private def cubePoly : ℤ[X] := X ^ 3 - C 2
+private noncomputable def cubePoly : ℤ[X] := X ^ 3 - C 2
 
 private lemma cubePoly_monic : cubePoly.Monic :=
   monic_X_pow_sub_C 2 (by norm_num)
@@ -44,7 +44,7 @@ private lemma cubePoly_isEisensteinAt :
     intro n hn
     simp only [cubePoly, natDegree_X_pow_sub_C] at hn
     interval_cases n <;>
-      (simp [cubePoly, coeff_sub, coeff_X_pow, coeff_C, Ideal.mem_span_singleton]; norm_num)
+      simp [cubePoly, coeff_sub, coeff_X_pow, coeff_C, Ideal.mem_span_singleton]
   · -- constant coefficient -2 is not in (2)² = (4)
     have hc : cubePoly.coeff 0 = -2 := by
       simp [cubePoly, coeff_sub, coeff_X_pow, coeff_C]
@@ -58,7 +58,7 @@ private lemma cubePoly_irreducible_int : Irreducible cubePoly :=
   cubePoly_isEisensteinAt.irreducible
     ((Ideal.span_singleton_prime (by norm_num : (2 : ℤ) ≠ 0)).mpr Int.prime_two)
     cubePoly_monic.isPrimitive
-    (by simp [cubePoly, natDegree_X_pow_sub_C])
+    (by norm_num [cubePoly, natDegree_X_pow_sub_C])
 
 -- ============================================================
 -- STEP 2: X³ - 2 IS IRREDUCIBLE OVER ℚ (Gauss's lemma)
@@ -67,8 +67,8 @@ private lemma cubePoly_irreducible_int : Irreducible cubePoly :=
 /-- The polynomial X³ - 2 is irreducible over ℚ. -/
 theorem X_cube_sub_two_irreducible : Irreducible (X ^ 3 - C (2 : ℚ)) := by
   have key : Irreducible (cubePoly.map (Int.castRingHom ℚ)) :=
-    cubePoly_monic.isPrimitive.Int.irreducible_iff_irreducible_map_cast.mp
-      cubePoly_irreducible_int
+    (Polynomial.IsPrimitive.Int.irreducible_iff_irreducible_map_cast
+      cubePoly_monic.isPrimitive).mp cubePoly_irreducible_int
   have hmap : cubePoly.map (Int.castRingHom ℚ) = X ^ 3 - C (2 : ℚ) := by
     simp only [cubePoly, map_sub, map_pow, map_X, map_C, Int.cast_ofNat]
   rwa [hmap] at key
@@ -106,10 +106,9 @@ theorem cube_doubling_impossible (k : ℕ) {F : Type*} [Field F] [Algebra ℚ F]
   have heval : aeval α (X ^ 3 - C (2 : ℚ)) = 0 := by
     rw [map_sub, map_pow, aeval_X, aeval_C, hα, sub_self]
   -- Since X³ - 2 is irreducible, it equals the minimal polynomial of α
-  have heq : X ^ 3 - C (2 : ℚ) = minpoly ℚ α := by
-    have h := X_cube_sub_two_irreducible.eq_minpoly heval
-    rwa [(monic_X_pow_sub_C (2 : ℚ) (by norm_num : (3 : ℕ) ≠ 0)).leadingCoeff,
-         map_one, one_mul] at h
+  have heq : X ^ 3 - C (2 : ℚ) = minpoly ℚ α :=
+    minpoly.eq_of_irreducible_of_monic X_cube_sub_two_irreducible heval
+      (monic_X_pow_sub_C (2 : ℚ) (by norm_num))
   -- The minimal polynomial has degree 3
   have hndeg : (minpoly ℚ α).natDegree = 3 := by
     rw [← heq, natDegree_X_pow_sub_C]
@@ -118,4 +117,4 @@ theorem cube_doubling_impossible (k : ℕ) {F : Type*} [Field F] [Algebra ℚ F]
   -- But [F:ℚ] = 2^k, so 3 ∣ 2^k
   rw [hk] at h3dvd
   -- Since 3 is prime and 3 ∣ 2^k, we get 3 ∣ 2 — a contradiction
-  exact absurd (prime_three.dvd_of_dvd_pow h3dvd) (by norm_num)
+  exact absurd ((by norm_num : Prime (3 : ℕ)).dvd_of_dvd_pow h3dvd) (by norm_num)
