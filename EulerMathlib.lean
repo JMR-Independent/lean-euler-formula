@@ -1128,8 +1128,8 @@ lemma petersenGraph_no_triangle :
 /-- The Petersen graph has no 4-cycle with distinct opposite vertices. -/
 lemma petersenGraph_no_4cycle :
     ∀ i j k l : Fin 10,
-    petersenGraph.Adj i j → petersenGraph.Adj j k → petersenGraph.Adj k l → petersenGraph.Adj l i →
-    i ≠ k → j ≠ l → False := by
+    ¬ (petersenGraph.Adj i j ∧ petersenGraph.Adj j k ∧ petersenGraph.Adj k l ∧
+       petersenGraph.Adj l i ∧ i ≠ k ∧ j ≠ l) := by
   native_decide
 
 /-- All cycles in the Petersen graph have length ≥ 5. -/
@@ -1142,27 +1142,31 @@ theorem petersenGraph_egirth_ge_5 : 5 ≤ petersenGraph.egirth := by
   have h3 : 3 ≤ w.length := hw.three_le_length
   have hlen : w.length = 3 ∨ w.length = 4 := by omega
   have hv0 : w.getVert 0 = v := SimpleGraph.Walk.getVert_zero w
-  rcases hlen with rfl | rfl
+  rcases hlen with h3eq | h4eq
   · -- 3-cycle: extract triangle
-    have hv3 : w.getVert 3 = v := SimpleGraph.Walk.getVert_length w
-    have h01 := w.adj_getVert_succ (show 0 < 3 by norm_num)
-    have h12 := w.adj_getVert_succ (show 1 < 3 by norm_num)
-    have h23 := w.adj_getVert_succ (show 2 < 3 by norm_num)
+    have hv3 : w.getVert 3 = v := by
+      have h := SimpleGraph.Walk.getVert_length w; rw [h3eq] at h; exact h
+    have h01 := w.adj_getVert_succ (show 0 < w.length by omega)
+    have h12 := w.adj_getVert_succ (show 1 < w.length by omega)
+    have h23 := w.adj_getVert_succ (show 2 < w.length by omega)
     rw [hv3, ← hv0] at h23
     exact petersenGraph_no_triangle _ _ _ h01 h12 h23
   · -- 4-cycle: extract cycle with distinct opposite vertices
-    have hv4 : w.getVert 4 = v := SimpleGraph.Walk.getVert_length w
-    have h01 := w.adj_getVert_succ (show 0 < 4 by norm_num)
-    have h12 := w.adj_getVert_succ (show 1 < 4 by norm_num)
-    have h23 := w.adj_getVert_succ (show 2 < 4 by norm_num)
-    have h34 := w.adj_getVert_succ (show 3 < 4 by norm_num)
+    have hv4 : w.getVert 4 = v := by
+      have h := SimpleGraph.Walk.getVert_length w; rw [h4eq] at h; exact h
+    have h01 := w.adj_getVert_succ (show 0 < w.length by omega)
+    have h12 := w.adj_getVert_succ (show 1 < w.length by omega)
+    have h23 := w.adj_getVert_succ (show 2 < w.length by omega)
+    have h34 := w.adj_getVert_succ (show 3 < w.length by omega)
     rw [hv4, ← hv0] at h34
-    have hinj := hw.getVert_injOn
+    have hinj := hw.getVert_injOn'
+    have mem : ∀ k : ℕ, k ≤ 3 → k ∈ {i | i ≤ w.length - 1} := fun k hk => by
+      simp only [Set.mem_setOf_eq]; omega
     have h02 : w.getVert 0 ≠ w.getVert 2 := fun heq =>
-      absurd (hinj (by simp [Finset.mem_range]) (by simp [Finset.mem_range]) heq) (by norm_num)
+      absurd (hinj (mem 0 (by omega)) (mem 2 (by omega)) heq) (by norm_num)
     have h13 : w.getVert 1 ≠ w.getVert 3 := fun heq =>
-      absurd (hinj (by simp [Finset.mem_range]) (by simp [Finset.mem_range]) heq) (by norm_num)
-    exact petersenGraph_no_4cycle _ _ _ _ h01 h12 h23 h34 h02 h13
+      absurd (hinj (mem 1 (by omega)) (mem 3 (by omega)) heq) (by norm_num)
+    exact petersenGraph_no_4cycle _ _ _ _ ⟨h01, h12, h23, h34, h02, h13⟩
 
 /--
 **Petersen graph is not planarly embeddable.**
@@ -1230,16 +1234,16 @@ lemma heawoodGraph_no_triangle :
 /-- The Heawood graph has no 4-cycle with distinct opposite vertices. -/
 lemma heawoodGraph_no_4cycle :
     ∀ i j k l : Fin 14,
-    heawoodGraph.Adj i j → heawoodGraph.Adj j k → heawoodGraph.Adj k l → heawoodGraph.Adj l i →
-    i ≠ k → j ≠ l → False := by
+    ¬ (heawoodGraph.Adj i j ∧ heawoodGraph.Adj j k ∧ heawoodGraph.Adj k l ∧
+       heawoodGraph.Adj l i ∧ i ≠ k ∧ j ≠ l) := by
   native_decide
 
-/-- The Heawood graph has no 5-cycle with all vertices distinct. -/
+/-- The Heawood graph has no 5-cycle with all non-adjacent vertices distinct. -/
 lemma heawoodGraph_no_5cycle :
     ∀ i j k l m : Fin 14,
-    heawoodGraph.Adj i j → heawoodGraph.Adj j k → heawoodGraph.Adj k l →
-    heawoodGraph.Adj l m → heawoodGraph.Adj m i →
-    i ≠ k → i ≠ l → j ≠ l → j ≠ m → k ≠ m → False := by
+    ¬ (heawoodGraph.Adj i j ∧ heawoodGraph.Adj j k ∧ heawoodGraph.Adj k l ∧
+       heawoodGraph.Adj l m ∧ heawoodGraph.Adj m i ∧
+       i ≠ k ∧ i ≠ l ∧ j ≠ l ∧ j ≠ m ∧ k ≠ m) := by
   native_decide
 
 /-- All cycles in the Heawood graph have length ≥ 6. -/
@@ -1252,42 +1256,55 @@ theorem heawoodGraph_egirth_ge_6 : 6 ≤ heawoodGraph.egirth := by
   have h3 : 3 ≤ w.length := hw.three_le_length
   have hlen : w.length = 3 ∨ w.length = 4 ∨ w.length = 5 := by omega
   have hv0 : w.getVert 0 = v := SimpleGraph.Walk.getVert_zero w
-  have hinj := hw.getVert_injOn
-  have mkne : ∀ a b : ℕ, a ∈ (Finset.range w.length).toSet →
-      b ∈ (Finset.range w.length).toSet → a ≠ b → w.getVert a ≠ w.getVert b :=
-    fun a b ha hb hab heq => absurd (hinj ha hb heq) hab
-  rcases hlen with rfl | rfl | rfl
+  rcases hlen with h3eq | h4eq | h5eq
   · -- 3-cycle: triangle
-    have hv3  : w.getVert 3 = v := SimpleGraph.Walk.getVert_length w
-    have h01  := w.adj_getVert_succ (show 0 < 3 by norm_num)
-    have h12  := w.adj_getVert_succ (show 1 < 3 by norm_num)
-    have h23  := w.adj_getVert_succ (show 2 < 3 by norm_num)
+    have hv3  : w.getVert 3 = v := by
+      have h := SimpleGraph.Walk.getVert_length w; rw [h3eq] at h; exact h
+    have h01  := w.adj_getVert_succ (show 0 < w.length by omega)
+    have h12  := w.adj_getVert_succ (show 1 < w.length by omega)
+    have h23  := w.adj_getVert_succ (show 2 < w.length by omega)
     rw [hv3, ← hv0] at h23
     exact heawoodGraph_no_triangle _ _ _ h01 h12 h23
   · -- 4-cycle
-    have hv4  : w.getVert 4 = v := SimpleGraph.Walk.getVert_length w
-    have h01  := w.adj_getVert_succ (show 0 < 4 by norm_num)
-    have h12  := w.adj_getVert_succ (show 1 < 4 by norm_num)
-    have h23  := w.adj_getVert_succ (show 2 < 4 by norm_num)
-    have h34  := w.adj_getVert_succ (show 3 < 4 by norm_num)
+    have hv4  : w.getVert 4 = v := by
+      have h := SimpleGraph.Walk.getVert_length w; rw [h4eq] at h; exact h
+    have h01  := w.adj_getVert_succ (show 0 < w.length by omega)
+    have h12  := w.adj_getVert_succ (show 1 < w.length by omega)
+    have h23  := w.adj_getVert_succ (show 2 < w.length by omega)
+    have h34  := w.adj_getVert_succ (show 3 < w.length by omega)
     rw [hv4, ← hv0] at h34
-    exact heawoodGraph_no_4cycle _ _ _ _ h01 h12 h23 h34
-      (mkne 0 2 (by simp) (by simp) (by norm_num))
-      (mkne 1 3 (by simp) (by simp) (by norm_num))
+    have hinj := hw.getVert_injOn'
+    have mem  : ∀ k : ℕ, k ≤ 3 → k ∈ {i | i ≤ w.length - 1} := fun k hk => by
+      simp only [Set.mem_setOf_eq]; omega
+    have h02 : w.getVert 0 ≠ w.getVert 2 := fun heq =>
+      absurd (hinj (mem 0 (by omega)) (mem 2 (by omega)) heq) (by norm_num)
+    have h13 : w.getVert 1 ≠ w.getVert 3 := fun heq =>
+      absurd (hinj (mem 1 (by omega)) (mem 3 (by omega)) heq) (by norm_num)
+    exact heawoodGraph_no_4cycle _ _ _ _ ⟨h01, h12, h23, h34, h02, h13⟩
   · -- 5-cycle
-    have hv5  : w.getVert 5 = v := SimpleGraph.Walk.getVert_length w
-    have h01  := w.adj_getVert_succ (show 0 < 5 by norm_num)
-    have h12  := w.adj_getVert_succ (show 1 < 5 by norm_num)
-    have h23  := w.adj_getVert_succ (show 2 < 5 by norm_num)
-    have h34  := w.adj_getVert_succ (show 3 < 5 by norm_num)
-    have h45  := w.adj_getVert_succ (show 4 < 5 by norm_num)
+    have hv5  : w.getVert 5 = v := by
+      have h := SimpleGraph.Walk.getVert_length w; rw [h5eq] at h; exact h
+    have h01  := w.adj_getVert_succ (show 0 < w.length by omega)
+    have h12  := w.adj_getVert_succ (show 1 < w.length by omega)
+    have h23  := w.adj_getVert_succ (show 2 < w.length by omega)
+    have h34  := w.adj_getVert_succ (show 3 < w.length by omega)
+    have h45  := w.adj_getVert_succ (show 4 < w.length by omega)
     rw [hv5, ← hv0] at h45
-    exact heawoodGraph_no_5cycle _ _ _ _ _ h01 h12 h23 h34 h45
-      (mkne 0 2 (by simp) (by simp) (by norm_num))
-      (mkne 0 3 (by simp) (by simp) (by norm_num))
-      (mkne 1 3 (by simp) (by simp) (by norm_num))
-      (mkne 1 4 (by simp) (by simp) (by norm_num))
-      (mkne 2 4 (by simp) (by simp) (by norm_num))
+    have hinj := hw.getVert_injOn'
+    have mem  : ∀ k : ℕ, k ≤ 4 → k ∈ {i | i ≤ w.length - 1} := fun k hk => by
+      simp only [Set.mem_setOf_eq]; omega
+    have h02 : w.getVert 0 ≠ w.getVert 2 := fun heq =>
+      absurd (hinj (mem 0 (by omega)) (mem 2 (by omega)) heq) (by norm_num)
+    have h03 : w.getVert 0 ≠ w.getVert 3 := fun heq =>
+      absurd (hinj (mem 0 (by omega)) (mem 3 (by omega)) heq) (by norm_num)
+    have h13 : w.getVert 1 ≠ w.getVert 3 := fun heq =>
+      absurd (hinj (mem 1 (by omega)) (mem 3 (by omega)) heq) (by norm_num)
+    have h14 : w.getVert 1 ≠ w.getVert 4 := fun heq =>
+      absurd (hinj (mem 1 (by omega)) (mem 4 (by omega)) heq) (by norm_num)
+    have h24 : w.getVert 2 ≠ w.getVert 4 := fun heq =>
+      absurd (hinj (mem 2 (by omega)) (mem 4 (by omega)) heq) (by norm_num)
+    exact heawoodGraph_no_5cycle _ _ _ _ _
+      ⟨h01, h12, h23, h34, h45, h02, h03, h13, h14, h24⟩
 
 /--
 **Heawood graph is not planarly embeddable.**
