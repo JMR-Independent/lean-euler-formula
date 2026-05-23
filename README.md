@@ -24,6 +24,7 @@ No `sorry`. CI on every commit.
 | `euler_via_vanStaudt` | Jordan-free Euler for any CMap satisfying the partition |
 | `torusCMap_fails_vanStaudt` | Torus as explicit non-planar counterexample |
 | `cube_doubling_impossible` | ∛2 not in any 2-power-degree extension of ℚ (Wiedijk #8) |
+| `desargues_theorem` | Desargues's theorem in ℙ K K³ over any commutative ring (Wiedijk #87) |
 
 ## Status
 

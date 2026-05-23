@@ -34,3 +34,6 @@ name = "Hypermap"
 
 [[lean_lib]]
 name = "Trisection"
+
+[[lean_lib]]
+name = "Desargues"
