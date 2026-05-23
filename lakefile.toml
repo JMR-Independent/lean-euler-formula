@@ -1,7 +1,7 @@
 name = "euler-mathlib"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["EulerMathlib"]
+defaultTargets = ["EulerMathlib", "CMapEuler", "Completeness", "IsPlanarIffIsSpherical", "GeometricEmbedding", "Hypermap", "Trisection", "Desargues"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`

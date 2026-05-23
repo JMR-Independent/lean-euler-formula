@@ -15,6 +15,7 @@
   This file implements Block 1: structural setup.
 -/
 import CMapEuler
+import Completeness
 
 namespace CombinatorialMap
 

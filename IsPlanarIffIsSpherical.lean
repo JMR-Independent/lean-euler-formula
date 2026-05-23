@@ -119,7 +119,7 @@ theorem isSpherical_iff_isPlanar (hconn : M.IsConnected) :
 /-- Consequence: the torus CMap is connected but NOT IsSpherical. -/
 theorem torusCMap_not_isSpherical : ¬ torusCMap.IsSpherical := by
   intro h
-  exact torusCMap.eulerChar_of_spherical h |>.elim
+  exact absurd (torusCMap.eulerChar_of_spherical h)
     (by simp [IsPlanar, eulerCharacteristic]; native_decide)
 
 /--
@@ -177,7 +177,6 @@ theorem all_examples_isSpherical_iff_isPlanar :
     (cubeMap.IsSpherical       ↔ cubeMap.IsPlanar) ∧
     (octahedronMap.IsSpherical ↔ octahedronMap.IsPlanar) := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
-    exact ⟨fun h => CombinatorialMap.eulerChar_of_spherical _ h,
-           fun h => ⟨_, _, _, _, rfl, rfl, rfl⟩⟩
+    exact CombinatorialMap.isSpherical_iff_isPlanar (by native_decide)
 
 end CombinatorialMap
