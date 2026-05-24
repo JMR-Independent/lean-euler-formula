@@ -12,7 +12,8 @@
     2. Show Euler characteristic is preserved (or changes in a controlled way)
     3. Induct on n to derive Euler for all connected planar hypermaps
 
-  This file implements Block 1: structural setup.
+  This file develops the Walkup reduction primitives and the Jordan-free
+  derivation of Euler's formula for concrete combinatorial maps.
 -/
 import CMapEuler
 import Completeness
@@ -21,7 +22,7 @@ namespace CombinatorialMap
 
 variable {n : ℕ}
 
-/-! ## Block 1: Removing a dart via Fin.succ embedding
+/-! ## Skip permutation: removing a single dart via Fin.succ embedding
 
 To "remove" dart 0 from a CombinatorialMap on Fin (n+1), we work with
 the embedding `Fin.succ : Fin n → Fin (n+1)`.
@@ -126,7 +127,7 @@ theorem skipPerm_involutive_safe (π : Equiv.Perm (Fin (n+1)))
 
 end CombinatorialMap
 
-/-! ## Block 5: Walkup — full 2-dart edge collapse
+/-! ## Edge collapse: removing the full edge {r, edgePerm r}
 
 Given a CombinatorialMap `M` on `Fin (n+2)` (at least 2 darts) and a
 dart `r`, removing the edge `{r, edgePerm r}` reduces to a map on `Fin n`.
@@ -217,7 +218,7 @@ noncomputable def collapseEdgePerm (π : Equiv.Perm (Fin (n+1)))
     (hinv : Function.Involutive π) (r d : Fin (n+1)) :
     collapseEdgePerm π hinv r d = collapseEdge π r d := rfl
 
-/-! ## Block 8: Walkup — making both r and (edge r) fixed everywhere
+/-! ## Walkup operation: fixing a pair of darts across all permutations
 
 The Walkup operation produces a new CombinatorialMap on Fin (n+1)
 where the dart pair {r, edge r} becomes "isolated":
@@ -228,9 +229,9 @@ where the dart pair {r, edge r} becomes "isolated":
 This requires the new permutations to satisfy:
   new_face * new_edge * new_vertex = 1
 
-We approach it via a SIMPLIFIED definition: the Walkup just turns
-{r, edge r} into fixed points in all three perms. The group relation
-needs to be re-verified.
+We adopt a simplified definition: `walkupAt` turns the pair {r, edge r}
+into fixed points across all three permutations. The group relation
+`face ∘ edge ∘ vertex = id` is then re-established by `walkupAt_composition`.
 -/
 
 /-- Walkup permutation: collapseEdge using the SAME edge `r, edgePerm r`
@@ -253,7 +254,7 @@ theorem walkupAt_eq_orig (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ d : Fin (n+1))
     walkupAt π r₁ r₂ d = π d := by
   unfold walkupAt; simp [h₁, h₂]
 
-/-! ## Block 9: The walkup-image-safety lemma
+/-! ## Image safety of walkupAt on the fixed-pair complement
 
 If π is a bijection that maps {r₁, r₂} to itself (i.e., r₁ ↦ r₂ and r₂ ↦ r₁,
 or both fixed), then π preserves the complement of {r₁, r₂}.
@@ -288,7 +289,7 @@ theorem walkupAt_image_safe (π : Equiv.Perm (Fin (n+1))) (r₁ r₂ d : Fin (n+
   · intro hcontra; exact h₁ (π.injective (hcontra.trans h.1.symm))
   · intro hcontra; exact h₂ (π.injective (hcontra.trans h.2.symm))
 
-/-! ## Block 10: composition preservation
+/-! ## Composition preservation under walkup
 
 Key theorem: if face, edge, vertex all fix {r₁, r₂} and their composition
 is the identity, then their walkups also compose to the identity.
@@ -310,12 +311,12 @@ theorem walkupAt_composition
   rw [walkupAt_of_fixed f r₁ r₂ hf (e (v d))]
   exact hcomp d
 
-/-! ## Block 11: degeneracy — walkup at already-fixed pair is identity
+/-! ## Degeneracy and the Dufourd walkup parameter
 
 When all three permutations already fix the pair, walking up does nothing.
 Note: in a valid CMap, edgePerm has no fixed points, so this block
 applies only to the auxiliary `walkupAt` construction — not to real CMap
-darts. The Dufourd-style walkup (Block 9+) handles the non-trivial case
+darts. The Dufourd-style walkup (above) handles the non-trivial case
 via `collapseEdge`.
 -/
 
@@ -332,7 +333,7 @@ theorem dufourdWalkupParameter_exists (M : CombinatorialMap (Fin (n+1))) :
 
 end CombinatorialMap
 
-/-! ## Block 12: Concrete instances satisfy vanStaudt_arith partition
+/-! ## vanStaudt partition for concrete CMaps
 
 For each concrete CMap, verify the Van Staudt partition hypothesis
 (V-1) + (F-1) = E. Combined with `vanStaudt_arith`, this gives a
@@ -377,7 +378,7 @@ theorem torusCMap_fails_vanStaudt :
     Fintype.card torusCMap.Edge := by
   native_decide
 
-/-! ## Block 13: Jordan-free Euler for concrete CMaps via vanStaudt_arith
+/-! ## Jordan-free Euler for concrete CMaps
 
 Each concrete planar CMap satisfies V + F = E + 2 derived using ONLY:
 - The Van Staudt partition (verified by native_decide)
@@ -417,7 +418,7 @@ theorem octahedronMap_euler_jordan_free :
   PlanarGraph.vanStaudt_arith _ _ _
     (by native_decide) (by native_decide) octahedronMap_vanStaudt
 
-/-! ## Block 14: A general Jordan-free Euler theorem for CMaps
+/-! ## General Jordan-free Euler theorem for CMaps
 
 Package the Jordan-free derivation as a reusable theorem on any CMap
 with a Van Staudt partition.
@@ -455,7 +456,7 @@ theorem CombinatorialMap.eulerChar_via_vanStaudt
   have := M.euler_via_vanStaudt hV hF hPart
   omega
 
-/-! ## Block 15: Concrete walkup verification on singleEdgeMap
+/-! ## Walkup verification: singleEdgeMap
 
 Apply collapseEdge to the actual edgePerm of singleEdgeMap and verify
 the result fixes both darts. This is the smallest concrete test of
@@ -492,7 +493,7 @@ theorem collapsed_is_identity : ∀ d, collapsedEdge d = d := by
 
 end SingleEdgeWalkupTest
 
-/-! ## Block 16: Walkup test on triangleMap
+/-! ## Walkup verification: triangleMap
 
 Collapse the first edge {0,1} of triangleMap and verify both darts
 become fixed in the resulting edge permutation. The other edges
