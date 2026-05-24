@@ -48,13 +48,19 @@ noncomputable instance [Fintype D] : Fintype M.Vertex := Fintype.ofFinite M.Vert
 noncomputable instance [Fintype D] : Fintype M.Edge   := Fintype.ofFinite M.Edge
 noncomputable instance [Fintype D] : Fintype M.Face   := Fintype.ofFinite M.Face
 
--- Computable instances when D has decidable equality (enables native_decide for card)
+-- Computable instances when D has decidable equality (enables native_decide for card).
+-- We pass the DecidableRel of SameCycle explicitly: the setoid's `(· ≈ ·)` is
+-- definitionally `SameCycle`, but typeclass search does not unfold the setoid
+-- structure, so Lean cannot find `Equiv.Perm.instDecidableRelSameCycle` on its own.
 instance [Fintype D] [DecidableEq D] : Fintype M.Vertex :=
-  Quotient.fintype (Equiv.Perm.SameCycle.setoid M.vertexPerm)
+  @Quotient.fintype D _ (Equiv.Perm.SameCycle.setoid M.vertexPerm)
+    (Equiv.Perm.instDecidableRelSameCycle M.vertexPerm)
 instance [Fintype D] [DecidableEq D] : Fintype M.Edge :=
-  Quotient.fintype (Equiv.Perm.SameCycle.setoid M.edgePerm)
+  @Quotient.fintype D _ (Equiv.Perm.SameCycle.setoid M.edgePerm)
+    (Equiv.Perm.instDecidableRelSameCycle M.edgePerm)
 instance [Fintype D] [DecidableEq D] : Fintype M.Face :=
-  Quotient.fintype (Equiv.Perm.SameCycle.setoid M.facePerm)
+  @Quotient.fintype D _ (Equiv.Perm.SameCycle.setoid M.facePerm)
+    (Equiv.Perm.instDecidableRelSameCycle M.facePerm)
 
 /-- Euler characteristic: V - E + F -/
 noncomputable def eulerCharacteristic [Fintype D] : ℤ :=
@@ -428,6 +434,7 @@ theorem planar_edge_bound (hplanar : M.IsPlanar)
     (hF : 3 * Fintype.card M.Face ≤ 2 * Fintype.card M.Edge) :
     Fintype.card M.Edge ≤ 3 * Fintype.card M.Vertex - 6 := by
   simp only [IsPlanar, eulerCharacteristic] at hplanar
+  zify [hV]
   omega
 
 /--
@@ -438,6 +445,7 @@ theorem bipartite_planar_edge_bound (hplanar : M.IsPlanar)
     (hF : 4 * Fintype.card M.Face ≤ 2 * Fintype.card M.Edge) :
     Fintype.card M.Edge ≤ 2 * Fintype.card M.Vertex - 4 := by
   simp only [IsPlanar, eulerCharacteristic] at hplanar
+  zify [hV]
   omega
 
 end CombinatorialMap
