@@ -1,0 +1,256 @@
+\maketitle
+
+\begin{abstract}
+This blueprint documents the formalization of Euler's polyhedron formula
+$V - E + F = 2$ for connected planar graphs in Lean 4 + Mathlib.
+The project uses the \texttt{CombinatorialMap} structure proposed in
+mathlib4 PR \#16074 alongside an inductive \texttt{PlanarGraph} type.
+All results are fully verified with no \texttt{sorry}.
+\end{abstract}
+
+%% ---------------------------------------------------------------
+\section{The inductive approach}
+%% ---------------------------------------------------------------
+
+\begin{definition}[PlanarGraph]\label{def:planar_graph}
+\lean{PlanarGraph}\leanok
+A \emph{planar graph} is a value of the inductive type
+$\texttt{PlanarGraph} : \N \to \N \to \N \to \text{Prop}$
+with three constructors:
+\begin{itemize}
+  \item $\texttt{point} : \texttt{PlanarGraph}\ 1\ 0\ 1$
+  \item $\texttt{addLeaf} : \texttt{PlanarGraph}\ v\ e\ f \to \texttt{PlanarGraph}\ (v{+}1)\ (e{+}1)\ f$
+  \item $\texttt{addEdge} : \texttt{PlanarGraph}\ v\ e\ f \to \texttt{PlanarGraph}\ v\ (e{+}1)\ (f{+}1)$
+\end{itemize}
+These three constructors correspond to the three elementary operations that
+preserve the Euler invariant for connected planar graphs.
+\end{definition}
+
+\begin{theorem}[Euler's formula]\label{thm:euler_formula}
+\lean{PlanarGraph.euler_formula}\leanok
+\uses{def:planar_graph}
+For any $\texttt{PlanarGraph}\ v\ e\ f$, we have $v + f = e + 2$.
+\end{theorem}
+
+\begin{corollary}[Integer form]\label{thm:euler_int}
+\lean{PlanarGraph.euler_int}\leanok
+\uses{thm:euler_formula}
+For any $\texttt{PlanarGraph}\ v\ e\ f$, we have $v - e + f = 2$ as integers.
+\end{corollary}
+
+%% ---------------------------------------------------------------
+\section{Structural theorems}
+%% ---------------------------------------------------------------
+
+\begin{proposition}[Vertex and face positivity]\label{prop:positivity}
+\lean{PlanarGraph.vertex_pos, PlanarGraph.face_pos}\leanok
+\uses{def:planar_graph}
+For any $\texttt{PlanarGraph}\ v\ e\ f$, we have $v \geq 1$ and $f \geq 1$.
+\end{proposition}
+
+\begin{theorem}[Edge bound]\label{thm:edge_bound}
+\lean{PlanarGraph.planar_edge_bound}\leanok
+\uses{thm:euler_formula}
+For any $\texttt{PlanarGraph}\ v\ e\ f$ with $v \geq 3$, we have $e \leq 3v - 6$.
+\end{theorem}
+
+\begin{theorem}[Girth bound]\label{thm:girth_bound}
+\lean{PlanarGraph.girth_planarity_bound}\leanok
+\uses{thm:euler_formula}
+For a planar graph with girth $g \geq 3$, the number of edges satisfies
+$e \leq \frac{g}{g-2}(v-2)$.
+\end{theorem}
+
+\begin{theorem}[Six-color bound]\label{thm:six_color}
+\lean{PlanarGraph.planar_six_degree_bound}\leanok
+\uses{thm:edge_bound}
+For any $\texttt{PlanarGraph}\ v\ e\ f$, we have $2e < 6v$.
+This is a key step toward the six-color theorem.
+\end{theorem}
+
+%% ---------------------------------------------------------------
+\section{Parametric families}
+%% ---------------------------------------------------------------
+
+\begin{theorem}[Path graphs]\label{thm:path}
+\lean{PlanarGraph.path_planar}\leanok
+\uses{def:planar_graph}
+For any $n \geq 1$, the path graph $P_n$ is planar.
+\end{theorem}
+
+\begin{theorem}[Star graphs]\label{thm:star}
+\lean{PlanarGraph.star_planar}\leanok
+\uses{def:planar_graph}
+For any $n \geq 1$, the star graph $K_{1,n}$ is planar.
+\end{theorem}
+
+\begin{theorem}[Cycle graphs]\label{thm:cycle}
+\lean{PlanarGraph.cycle_planar}\leanok
+\uses{def:planar_graph}
+For any $n \geq 3$, the cycle graph $C_n$ is planar.
+\end{theorem}
+
+\begin{theorem}[Wheel graphs]\label{thm:wheel}
+\lean{PlanarGraph.wheel_planar}\leanok
+\uses{thm:cycle}
+For any $n \geq 3$, the wheel graph $W_n$ is planar.
+\end{theorem}
+
+\begin{theorem}[Prism graphs]\label{thm:prism}
+\lean{PlanarGraph.prism_planar}\leanok
+\uses{def:planar_graph}
+For any $n \geq 3$, the prism graph $Y_n$ is planar.
+\end{theorem}
+
+\begin{theorem}[Antiprism graphs]\label{thm:antiprism}
+\lean{PlanarGraph.antiprism_planar}\leanok
+\uses{def:planar_graph}
+For any $n \geq 3$, the antiprism graph $A_n$ is planar.
+\end{theorem}
+
+%% ---------------------------------------------------------------
+\section{Non-planarity}
+%% ---------------------------------------------------------------
+
+\begin{theorem}[$K_5$ is not planar]\label{thm:k5}
+\lean{PlanarGraph.k5_not_planar}\leanok
+\uses{thm:edge_bound}
+The complete graph $K_5$ is not planar.
+\end{theorem}
+
+\begin{theorem}[$K_{3,3}$ is not planar]\label{thm:k33}
+\lean{PlanarGraph.k33_not_planar}\leanok
+\uses{thm:girth_bound}
+The complete bipartite graph $K_{3,3}$ is not planar.
+\end{theorem}
+
+\begin{theorem}[Petersen graph]\label{thm:petersen}
+\lean{PlanarGraph.petersen_not_planar}\leanok
+\uses{thm:girth_bound}
+The Petersen graph is not planar.
+\end{theorem}
+
+\begin{theorem}[Heawood graph]\label{thm:heawood}
+\lean{PlanarGraph.heawood_not_planar}\leanok
+\uses{thm:girth_bound}
+The Heawood graph is not planar.
+\end{theorem}
+
+%% ---------------------------------------------------------------
+\section{Platonic solids (Wiedijk \#38)}
+%% ---------------------------------------------------------------
+
+\begin{theorem}[Platonic constraint]\label{thm:platonic_constraint}
+\lean{PlanarGraph.platonic_constraint}\leanok
+\uses{thm:euler_formula, thm:edge_bound}
+If every face has degree $q$ and every vertex has degree $p$, then
+$(p-2)(q-2) < 4$.
+\end{theorem}
+
+\begin{theorem}[Classification of Platonic solids]\label{thm:platonic_classification}
+\lean{PlanarGraph.platonic_classification}\leanok
+\uses{thm:platonic_constraint}
+The only regular convex polyhedra are the tetrahedron, cube, octahedron,
+dodecahedron, and icosahedron.
+\end{theorem}
+
+%% ---------------------------------------------------------------
+\section{Combinatorial maps}
+%% ---------------------------------------------------------------
+
+\begin{definition}[CombinatorialMap]\label{def:cmap}
+\lean{CombinatorialMap}\leanok
+A combinatorial map on a dart set $D$ consists of three permutations
+$\sigma, \alpha, \varphi : D \to D$ satisfying $\varphi \circ \alpha \circ \sigma = \text{id}$,
+where $\alpha$ is an involution with no fixed points.
+The orbits of $\sigma$, $\alpha$, and $\varphi$ correspond to vertices,
+edges, and faces respectively.
+This definition replicates the structure proposed in mathlib4 PR \#16074~\cite{mathlib4pr16074}.
+\end{definition}
+
+\begin{definition}[IsSpherical]\label{def:spherical}
+\lean{CombinatorialMap.IsSpherical}\leanok
+\uses{def:cmap, def:planar_graph}
+A combinatorial map is \emph{spherical} if its vertex, edge, and face
+counts match those of some \texttt{PlanarGraph} witness.
+\end{definition}
+
+\begin{theorem}[Edge count]\label{thm:edge_count}
+\lean{CombinatorialMap.edge_count_eq}\leanok
+\uses{def:cmap}
+For any combinatorial map with a fixed-point-free involution $\alpha$,
+the number of edges equals $|\D|/2$.
+\end{theorem}
+
+\begin{theorem}[Spherical implies planar]\label{thm:spherical_planar}
+\lean{CombinatorialMap.eulerChar_of_spherical}\leanok
+\uses{def:spherical, thm:euler_formula}
+Every spherical combinatorial map is planar, i.e., its Euler characteristic
+equals $2$.
+\end{theorem}
+
+\begin{theorem}[Spherical iff planar]\label{thm:spherical_iff_planar}
+\lean{CombinatorialMap.isSpherical_iff_isPlanar}\leanok
+\uses{def:spherical, thm:spherical_planar}
+For any connected combinatorial map, being spherical is equivalent to
+being planar. The hard direction constructs a \texttt{PlanarGraph} witness
+directly from the Euler equation, without the Jordan curve theorem.
+\end{theorem}
+
+\begin{example}[Concrete planar maps]\label{ex:concrete}
+\lean{CombinatorialMap.triangleMap_isPlanar,
+      CombinatorialMap.k4Map_isPlanar,
+      CombinatorialMap.cubeMap_isPlanar,
+      CombinatorialMap.octahedronMap_isPlanar}\leanok
+\uses{thm:spherical_planar}
+The following combinatorial maps are verified planar via \texttt{native\_decide}:
+triangle (6 darts), $K_4$ (12 darts), cube (24 darts), octahedron (24 darts).
+\end{example}
+
+\begin{example}[Torus as counterexample]\label{ex:torus}
+\lean{CombinatorialMap.torusCMap}\leanok
+\uses{def:cmap}
+The torus combinatorial map (4 darts) is a valid connected map with
+Euler characteristic $0$, showing connectivity alone does not imply planarity.
+\end{example}
+
+%% ---------------------------------------------------------------
+\section{Jordan-free arithmetic route}
+%% ---------------------------------------------------------------
+
+\begin{definition}[Van Staudt partition]\label{def:vanstaudt}
+\lean{CombinatorialMap.HasVanStaudtPartition}\leanok
+\uses{def:cmap}
+A combinatorial map \emph{satisfies the Van Staudt partition} if its dart
+set admits a partition into a spanning tree and co-tree: $|\D| = 2(V-1) + 2(F-1)$,
+equivalently $(V-1) + (F-1) = E$.
+\end{definition}
+
+\begin{theorem}[Van Staudt arithmetic]\label{thm:vanstaudt_arith}
+\lean{PlanarGraph.vanStaudt_arith}\leanok
+\uses{def:vanstaudt}
+If $(V-1) + (F-1) = E$ then $V + F = E + 2$.
+This is the arithmetic core of a Jordan-free proof of Euler's formula.
+\end{theorem}
+
+\begin{theorem}[Jordan-free Euler]\label{thm:euler_vanstaudt}
+\lean{CombinatorialMap.euler_via_vanStaudt}\leanok
+\uses{thm:vanstaudt_arith, def:vanstaudt}
+For any combinatorial map satisfying the Van Staudt partition,
+$V + F = E + 2$ follows by pure arithmetic.
+\end{theorem}
+
+\begin{theorem}[Torus fails Van Staudt]\label{thm:torus_fails}
+\lean{CombinatorialMap.torusCMap_fails_vanStaudt}\leanok
+\uses{def:vanstaudt, ex:torus}
+The torus map explicitly fails the Van Staudt partition, consistent
+with its Euler characteristic being $0$ rather than $2$.
+\end{theorem}
+
+\begin{remark}[What remains]
+Constructing the Van Staudt partition algorithmically for an arbitrary
+connected planar combinatorial map is the main open problem in this
+formalization. Currently the partition is verified by \texttt{native\_decide}
+on concrete instances. The infrastructure for the Dufourd/Gonthier
+Walkup reduction is under development in \texttt{Hypermap.lean}.
+\end{remark}

@@ -6,14 +6,38 @@ PR #16074, alongside an inductive `PlanarGraph` type for structural results.
 
 No `sorry`. CI on every commit.
 
-## Selected results
+## Status and limitations
+
+This repository develops the **combinatorial side** of planarity: Euler's
+formula is proved on an inductive `PlanarGraph` type whose constructors
+(`point`, `addLeaf`, `addEdge`) are exactly the operations that preserve
+`V - E + F`. Concrete witnesses (`triangle`, `k4`, `cube_witness`,
+`octahedron_witness`, `dodecahedron_planar_witness`,
+`icosahedron_planar_witness`) verify that classical examples sit inside
+this type.
+
+The bridge to **topological planarity in ℝ²** is in progress in
+`Hypermap.lean` (Walkup reduction). The Jordan-curve route is not pursued
+here; the Jordan-free arithmetic derivation lives in `Completeness.lean`
+(`euler_via_vanStaudt`) and is currently verified by `native_decide` on
+explicit CMaps, with the torus as a non-planar counterexample
+(`torusCMap_fails_vanStaudt`).
+
+What this repository **does not** claim: a full proof that any graph
+admitting a topological embedding in ℝ² is a `PlanarGraph` in our sense.
+That direction requires either the Jordan curve theorem or a complete
+algorithmic spanning-tree partition for arbitrary CMaps, both noted as
+open work below.
+
+## Euler-related results
 
 | Result | Description |
 |---|---|
 | `euler_formula` | V + F = E + 2 for any `PlanarGraph` (Wiedijk #13) |
+| `euler_int` | Signed form V - E + F = 2 |
 | `platonic_classification` | The five Platonic solids (Wiedijk #50) |
-| `petersenGraph_egirth_ge_5` | Petersen graph has girth ≥ 5 (formally proved, no hypothesis) |
-| `heawoodGraph_egirth_ge_6` | Heawood graph has girth ≥ 6 (formally proved, no hypothesis) |
+| `petersenGraph_egirth_ge_5` | Petersen graph has girth ≥ 5 (formally proved) |
+| `heawoodGraph_egirth_ge_6` | Heawood graph has girth ≥ 6 (formally proved) |
 | `kn_not_planar` | K_n is not planar for any n ≥ 5 (infinite family, pure arithmetic) |
 | `petersen_not_planar`, `heawood_not_planar` | Non-planarity via girth bounds |
 | `girth_planarity_bound` | Edge bound from girth; implies K₅ and K₃,₃ cases |
@@ -23,10 +47,19 @@ No `sorry`. CI on every commit.
 | `isSpherical_iff_isPlanar` | Equivalence between the two internal planarity notions |
 | `euler_via_vanStaudt` | Jordan-free Euler for any CMap satisfying the partition |
 | `torusCMap_fails_vanStaudt` | Torus as explicit non-planar counterexample |
+
+## Additional Wiedijk formalizations
+
+These results live in this repository for convenience but are independent
+of Euler's formula. Each is self-contained and could be extracted into its
+own project.
+
+| Result | Description |
+|---|---|
 | `cube_doubling_impossible` | ∛2 not in any 2-power-degree extension of ℚ (Wiedijk #8) |
 | `desargues_theorem` | Desargues's theorem in ℙ K K³ over any commutative ring (Wiedijk #87) |
 
-## Status
+## Details
 
 The combinatorial side is complete: inductive `PlanarGraph`, nine parametric
 families, Platonic solid classification, non-planarity of K₅ and K₃,₃
@@ -53,10 +86,12 @@ non-2-colorability because the 5-cycle is an odd cycle (`native_decide`).
 element cubing to 2. The algebraic core: X³ − 2 is irreducible over ℚ (Eisenstein at p=2 over ℤ,
 lifted by Gauss's lemma), so [ℚ(∛2):ℚ] = 3 divides [F:ℚ] = 2^k, forcing 3 ∣ 2, contradiction.
 
-What remains: constructing the spanning-tree partition algorithmically for
-arbitrary CMaps (currently verified by `native_decide` on concrete instances),
-and connecting to topological planarity in ℝ², which requires either the
-Jordan curve theorem or the full Walkup reduction (`Hypermap.lean`).
+## Open work
+
+- Constructing the spanning-tree partition algorithmically for arbitrary CMaps
+  (currently verified by `native_decide` on concrete instances).
+- Connecting to topological planarity in ℝ², which requires either the
+  Jordan curve theorem or the full Walkup reduction (`Hypermap.lean`).
 
 ## Related work
 

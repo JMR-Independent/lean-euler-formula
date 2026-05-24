@@ -1,1 +1,14 @@
 /.lake
+/build
+*.olean
+.DS_Store
+
+# leanblueprint build output
+blueprint/web/
+blueprint/print/
+blueprint/*.aux
+blueprint/*.log
+blueprint/*.out
+blueprint/*.toc
+blueprint/*.bbl
+blueprint/*.blg
